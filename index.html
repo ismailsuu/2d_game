@@ -15,19 +15,21 @@
     html, body {
       width: 100%;
       height: 100dvh;
-      background-color: #0f172a;
+      background-color: #0b0f19;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Courier New', Courier, monospace;
     }
 
-    /* ANA MENÜ */
+    /* RETRO PİKSEL ANA MENÜ */
     #main-menu {
       position: fixed;
       inset: 0;
-      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 65%, #16a34a 65%, #15803d 100%);
+      background:
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 2px, transparent 2px, transparent 4px),
+        linear-gradient(180deg, #5c94fc 0%, #5c94fc 68%, #00a800 68%, #00a800 72%, #c84c0c 72%, #c84c0c 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -37,49 +39,50 @@
       text-align: center;
     }
     .game-title {
-      font-size: clamp(34px, 6.5vw, 58px);
+      font-size: clamp(32px, 6.5vw, 56px);
       font-weight: 900;
-      color: #ffffff;
-      text-shadow: 4px 4px 0 #1e293b, -1px -1px 0 #1e293b;
-      margin-bottom: 32px;
-      letter-spacing: 2px;
+      color: #fbd000;
+      text-shadow: 4px 4px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+      margin-bottom: 36px;
+      letter-spacing: 3px;
     }
     .menu-buttons {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
       width: 100%;
       max-width: 290px;
     }
     .menu-btn {
-      padding: 15px 20px;
+      padding: 14px 18px;
       font-size: 18px;
-      font-weight: bold;
-      border: 3px solid #ffffff;
-      border-radius: 14px;
-      color: white;
+      font-weight: 900;
+      font-family: 'Courier New', Courier, monospace;
+      border: 4px solid #000;
+      border-radius: 0;
+      color: #fff;
       cursor: pointer;
-      box-shadow: 0 6px 0 rgba(15, 23, 42, 0.5);
-      transition: transform 0.1s;
+      box-shadow: inset -4px -4px 0 rgba(0,0,0,0.35), inset 4px 4px 0 rgba(255,255,255,0.35), 4px 4px 0 #000;
+      text-shadow: 2px 2px 0 #000;
     }
     .menu-btn:active {
-      transform: translateY(4px);
-      box-shadow: 0 2px 0 rgba(15, 23, 42, 0.5);
+      transform: translate(3px, 3px);
+      box-shadow: inset 2px 2px 0 rgba(0,0,0,0.4), 1px 1px 0 #000;
     }
     #btn-continue {
-      background: #22c55e;
+      background: #00a800;
       display: none;
     }
     #btn-new-game {
-      background: #ef4444;
+      background: #e52521;
     }
 
-    /* OYUN SAHNESİ (Varsayılan / Masaüstü Düzeni) */
+    /* OYUN SAHNESİ */
     #game-stage {
       display: none;
       position: fixed;
       inset: 0;
-      background: #0f172a;
+      background: #0b0f19;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -89,42 +92,45 @@
       width: 100%;
       max-width: 800px;
       aspect-ratio: 16 / 9;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      transition: all 0.25s ease;
+      border: 3px solid #000;
+      box-shadow: 0 0 0 2px #334155;
+      transition: all 0.2s ease;
     }
     canvas {
       width: 100%;
       height: 100%;
       display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
     }
     #hud {
       position: absolute;
       top: 10px;
-      left: 16px;
-      right: 16px;
+      left: 14px;
+      right: 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 900;
       text-shadow: 2px 2px 0 #000;
       z-index: 5;
       pointer-events: none;
     }
     #btn-in-game-menu {
       pointer-events: auto;
-      background: rgba(15, 23, 42, 0.55);
-      border: 1.5px solid rgba(255, 255, 255, 0.6);
-      color: white;
-      padding: 4px 10px;
-      border-radius: 8px;
-      font-size: 14px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 2px solid #fff;
+      color: #fff;
+      padding: 4px 8px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 13px;
       font-weight: bold;
       cursor: pointer;
     }
 
-    /* MOBİL KONTROLLER */
+    /* RETRO PİKSEL KONTROL TUŞLARI */
     #mobile-controls {
       display: none;
       width: 100%;
@@ -135,32 +141,34 @@
     }
     .btn-group {
       display: flex;
-      gap: 22px;
+      gap: 20px;
       pointer-events: auto;
     }
     .ctrl-btn {
       width: 78px;
       height: 78px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.16);
-      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 3px solid rgba(255, 255, 255, 0.4);
       color: rgba(255, 255, 255, 0.9);
-      font-size: 28px;
-      font-weight: bold;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 30px;
+      font-weight: 900;
       display: flex;
       align-items: center;
       justify-content: center;
       touch-action: manipulation;
       pointer-events: auto;
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+      text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.7);
+      box-shadow: inset -3px -3px 0 rgba(0,0,0,0.25), inset 3px 3px 0 rgba(255,255,255,0.2);
     }
     .ctrl-btn:active {
-      background: rgba(255, 255, 255, 0.4);
-      border-color: rgba(255, 255, 255, 0.8);
-      transform: scale(0.94);
+      background: rgba(255, 255, 255, 0.35);
+      border-color: #fff;
+      transform: scale(0.95);
     }
 
-    /* 1) MOBİL DİK MOD (PORTRAIT): Oyun üstte kompakt 16:9 açılır, tuşlar altında durur */
+    /* DİK MOD: Üstte 16:9 oyun, altta tuşlar */
     @media (hover: none) and (pointer: coarse) and (orientation: portrait) {
       #game-stage {
         justify-content: space-between;
@@ -179,12 +187,9 @@
         padding: 0 24px;
         margin-bottom: 12px;
       }
-      .ctrl-btn {
-        background: rgba(255, 255, 255, 0.12);
-      }
     }
 
-    /* 2) MOBİL YATAY MOD (LANDSCAPE): Oyun tam ekrana büyür, tuşlar ekranın köşelerine geçer */
+    /* YATAY MOD: Tam ekran oyun */
     @media (hover: none) and (pointer: coarse) and (orientation: landscape) {
       #game-container {
         width: 100vw;
@@ -192,6 +197,7 @@
         max-width: 100vw;
         max-height: 100dvh;
         aspect-ratio: auto;
+        border: none;
       }
       #mobile-controls {
         display: flex;
@@ -219,10 +225,10 @@
   <div id="game-stage">
     <div id="game-container">
       <div id="hud">
-        <span>BÖLÜM: <span id="level">1 / 5</span></span>
-        <span>SKOR: <span id="score">0</span></span>
-        <span>ALTIN: <span id="coins">0</span></span>
-        <button id="btn-in-game-menu">☰ MENÜ</button>
+        <span>BÖLÜM:<span id="level">1/5</span></span>
+        <span>SKOR:<span id="score">0</span></span>
+        <span>ALTIN:<span id="coins">0</span></span>
+        <button id="btn-in-game-menu">MENÜ</button>
       </div>
       <canvas id="gameCanvas" width="800" height="450"></canvas>
     </div>
@@ -237,7 +243,6 @@
   </div>
 
 <script>
-// Service Worker Kaydı
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/2d_game/sw.js', { scope: '/2d_game/' })
@@ -255,6 +260,8 @@ const btnInGameMenu = document.getElementById('btn-in-game-menu');
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+
 const levelEl = document.getElementById('level');
 const scoreEl = document.getElementById('score');
 const coinsEl = document.getElementById('coins');
@@ -270,6 +277,7 @@ let gameOver = false;
 let levelCleared = false;
 let allCompleted = false;
 let isGameRunning = false;
+let animTick = 0;
 
 const keys = { right: false, left: false };
 
@@ -278,10 +286,147 @@ const player = {
   vx: 0, vy: 0, speed: 4.0, jumpPower: -10.8,
   grounded: false,
   jumpCount: 0,
-  maxJumps: 2
+  maxJumps: 2,
+  facing: 1
 };
 
 let jumpEffects = [];
+
+// PİKSEL ART SPRITE MATRİSLERİ (8-Bit Retro Karakter ve Düşmanlar)
+const SPRITES = {
+  playerIdle: {
+    palette: { R: '#e52521', S: '#ffcc99', B: '#0058f8', H: '#6b3e08', Y: '#fbd000' },
+    grid: [
+      '...RRRRR....',
+      '..RRRRRRRR..',
+      '..HHHSSHS...',
+      '.HSHSSSHSS..',
+      '.HSHHSSSHSS.',
+      '.HHSSSSHHHH.',
+      '...SSSSSS...',
+      '..RRBRRBR...',
+      '.RRRBRRBRR..',
+      'RRRRBBBBBRRR',
+      'SS.BYBBYB.SS',
+      'SS.BBBBBB.SS',
+      '...BBB.BBB..',
+      '..HHH...HHH.'
+    ]
+  },
+  playerWalk: {
+    palette: { R: '#e52521', S: '#ffcc99', B: '#0058f8', H: '#6b3e08', Y: '#fbd000' },
+    grid: [
+      '...RRRRR....',
+      '..RRRRRRRR..',
+      '..HHHSSHS...',
+      '.HSHSSSHSS..',
+      '.HSHHSSSHSS.',
+      '.HHSSSSHHHH.',
+      '...SSSSSS...',
+      '..RRBRRBR...',
+      '.RRRBRRBRR..',
+      'RRRRBBBBBRRR',
+      'SS.BYBBYB.SS',
+      '...BBBBBB...',
+      '.HHH....BBB.',
+      '........HHH.'
+    ]
+  },
+  goomba: {
+    palette: { B: '#c84c0c', D: '#5c2204', W: '#ffffff', K: '#000000', S: '#fca044' },
+    grid: [
+      '....BBBB....',
+      '...BBBBBB...',
+      '..BBBBBBBB..',
+      '.BBBBBBBBBB.',
+      'BBWKKBBKKWBB',
+      'BBWKKBBKKWBB',
+      'BBBBBBBBBBBB',
+      '.BBBBBBBBBB.',
+      '...SSSSSS...',
+      '..SSSSSSSS..',
+      '.DDD....DDD.',
+      'DDDD....DDDD'
+    ]
+  },
+  jumper: {
+    palette: { G: '#00a800', L: '#80d010', W: '#ffffff', K: '#000000' },
+    grid: [
+      '..GGGGGGGG..',
+      '.GLLLLLLLLG.',
+      'GLLWWLLWWLLG',
+      'GLLWKLLWKLLG',
+      'GLLLLLLLLLLG',
+      'GLKKKKKKKKLG',
+      'GLLLLLLLLLLG',
+      '.GGGGGGGGGG.',
+      'GGG..GG..GGG',
+      'KKK......KKK'
+    ]
+  },
+  flyer: {
+    palette: { P: '#9333ea', L: '#d8b4fe', W: '#ffffff', Y: '#fbd000', K: '#000000' },
+    grid: [
+      'LL........LL',
+      'LLL..PP..LLL',
+      'LLLLPPPPLLLL',
+      '.LLPPWWPPLL.',
+      '..PPWKKWPP..',
+      '..PPPPPPPP..',
+      '...PPYYPP...',
+      '....P..P....'
+    ]
+  },
+  spiky: {
+    palette: { W: '#ffffff', R: '#e52521', D: '#991b1b', Y: '#fbd000', K: '#000000' },
+    grid: [
+      '..W..WW..W..',
+      '.WW.WWWW.WW.',
+      '.RRRRRRRRRR.',
+      'RRRRRRRRRRRR',
+      'RRYYRRRRYYRR',
+      'RRYKRRRRYKRR',
+      'DDDDDDDDDDDD',
+      '.KKK....KKK.'
+    ]
+  },
+  coin: {
+    palette: { Y: '#fbd000', O: '#c84c0c', W: '#ffffff' },
+    grid: [
+      '..YYYY..',
+      '.YWWWWY.',
+      'YWYYYYOY',
+      'YWYOOYOY',
+      'YWYOOYOY',
+      'YWYYYYOY',
+      '.YYYYOY.',
+      '..OOOO..'
+    ]
+  }
+};
+
+function drawSprite(spriteObj, x, y, w, h, flipX = false) {
+  const { palette, grid } = spriteObj;
+  const rows = grid.length;
+  const cols = grid[0].length;
+  const pw = w / cols;
+  const ph = h / rows;
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const ch = grid[r][c];
+      if (ch === '.') continue;
+      ctx.fillStyle = palette[ch];
+      const drawCol = flipX ? (cols - 1 - c) : c;
+      ctx.fillRect(
+        Math.floor(x + drawCol * pw),
+        Math.floor(y + r * ph),
+        Math.ceil(pw),
+        Math.ceil(ph)
+      );
+    }
+  }
+}
 
 function getSavedProgress() {
   try {
@@ -314,7 +459,6 @@ function startGame(startLevel, startScore, startCoins) {
   isGameRunning = true;
   mainMenu.style.display = 'none';
   gameStage.style.display = 'flex';
-
   score = startScore;
   coinCount = startCoins;
   allCompleted = false;
@@ -343,7 +487,7 @@ btnContinue.addEventListener('click', () => {
 
 btnInGameMenu.addEventListener('click', returnToMenu);
 
-// 5 Farklı Bölüm
+// 5 Farklı Bölüm (Retro Paletlerle)
 const LEVELS = [
   {
     sky: "#5c94fc", groundTop: "#00a800", groundBody: "#c84c0c",
@@ -356,8 +500,8 @@ const LEVELS = [
       { x: 520, y: 200, w: 90, h: 25, type: 'brick' },
       { x: 960, y: 260, w: 140, h: 25, type: 'brick' },
       { x: 1250, y: 180, w: 100, h: 25, type: 'brick' },
-      { x: 430, y: 340, w: 45, h: 60, type: 'pipe' },
-      { x: 1140, y: 320, w: 45, h: 80, type: 'pipe' }
+      { x: 430, y: 340, w: 48, h: 60, type: 'pipe' },
+      { x: 1140, y: 320, w: 48, h: 80, type: 'pipe' }
     ],
     coins: [
       { x: 280, y: 240 }, { x: 320, y: 240 }, { x: 360, y: 240 },
@@ -371,7 +515,7 @@ const LEVELS = [
     ]
   },
   {
-    sky: "#f97316", groundTop: "#65a30d", groundBody: "#78350f",
+    sky: "#d85800", groundTop: "#80d010", groundBody: "#7c3000",
     flagX: 2500,
     platforms: [
       { x: 0, y: 400, w: 600, h: 50, type: 'ground' },
@@ -383,7 +527,7 @@ const LEVELS = [
       { x: 860, y: 250, w: 130, h: 25, type: 'brick' },
       { x: 1520, y: 240, w: 120, h: 25, type: 'brick' },
       { x: 1740, y: 160, w: 110, h: 25, type: 'brick' },
-      { x: 1080, y: 330, w: 45, h: 70, type: 'pipe' }
+      { x: 1080, y: 330, w: 48, h: 70, type: 'pipe' }
     ],
     coins: [
       { x: 470, y: 140 }, { x: 510, y: 140 }, { x: 665, y: 220 },
@@ -391,14 +535,14 @@ const LEVELS = [
       { x: 1770, y: 120 }, { x: 1810, y: 120 }, { x: 2005, y: 200 }
     ],
     enemies: [
-      { type: 'flyer', x: 650, y: 240, baseY: 240, w: 34, h: 26, vx: -1.4, minX: 520, maxX: 820, phase: 0 },
+      { type: 'flyer', x: 650, y: 240, baseY: 240, w: 36, h: 26, vx: -1.4, minX: 520, maxX: 820, phase: 0 },
       { type: 'goomba', x: 950, y: 368, w: 32, h: 32, vx: -1.4, minX: 750, maxX: 1060 },
-      { type: 'flyer', x: 1300, y: 220, baseY: 220, w: 34, h: 26, vx: -1.6, minX: 1150, maxX: 1480, phase: 1.5 },
+      { type: 'flyer', x: 1300, y: 220, baseY: 220, w: 36, h: 26, vx: -1.6, minX: 1150, maxX: 1480, phase: 1.5 },
       { type: 'jumper', x: 1650, y: 368, w: 32, h: 32, vx: -1.2, vy: 0, minX: 1420, maxX: 1900 }
     ]
   },
   {
-    sky: "#1e1b4b", groundTop: "#4f46e5", groundBody: "#312e81",
+    sky: "#000038", groundTop: "#3858d8", groundBody: "#182878",
     flagX: 2650,
     platforms: [
       { x: 0, y: 400, w: 680, h: 50, type: 'ground' },
@@ -417,14 +561,14 @@ const LEVELS = [
       { x: 1900, y: 220 }, { x: 2150, y: 150 }, { x: 2190, y: 150 }
     ],
     enemies: [
-      { type: 'spiky', x: 450, y: 370, w: 34, h: 30, vx: -1.3, minX: 240, maxX: 650 },
-      { type: 'spiky', x: 1150, y: 370, w: 34, h: 30, vx: -1.5, minX: 850, maxX: 1450 },
-      { type: 'flyer', x: 1560, y: 230, baseY: 230, w: 34, h: 26, vx: -1.5, minX: 1420, maxX: 1720, phase: 0 },
-      { type: 'spiky', x: 2050, y: 370, w: 34, h: 30, vx: -1.6, minX: 1750, maxX: 2400 }
+      { type: 'spiky', x: 450, y: 368, w: 36, h: 32, vx: -1.3, minX: 240, maxX: 650 },
+      { type: 'spiky', x: 1150, y: 368, w: 36, h: 32, vx: -1.5, minX: 850, maxX: 1450 },
+      { type: 'flyer', x: 1560, y: 230, baseY: 230, w: 36, h: 26, vx: -1.5, minX: 1420, maxX: 1720, phase: 0 },
+      { type: 'spiky', x: 2050, y: 368, w: 36, h: 32, vx: -1.6, minX: 1750, maxX: 2400 }
     ]
   },
   {
-    sky: "#450a0a", groundTop: "#dc2626", groundBody: "#1f2937",
+    sky: "#280000", groundTop: "#e52521", groundBody: "#3c3c3c",
     flagX: 2800,
     platforms: [
       { x: 0, y: 400, w: 480, h: 50, type: 'ground' },
@@ -442,13 +586,13 @@ const LEVELS = [
     ],
     enemies: [
       { type: 'jumper', x: 350, y: 368, w: 32, h: 32, vx: -1.3, vy: 0, minX: 200, maxX: 460 },
-      { type: 'flyer', x: 860, y: 210, baseY: 210, w: 34, h: 26, vx: -1.7, minX: 660, maxX: 1120, phase: 0.8 },
-      { type: 'spiky', x: 1600, y: 370, w: 34, h: 30, vx: -1.7, minX: 1300, maxX: 1800 },
+      { type: 'flyer', x: 860, y: 210, baseY: 210, w: 36, h: 26, vx: -1.7, minX: 660, maxX: 1120, phase: 0.8 },
+      { type: 'spiky', x: 1600, y: 368, w: 36, h: 32, vx: -1.7, minX: 1300, maxX: 1800 },
       { type: 'jumper', x: 2550, y: 368, w: 32, h: 32, vx: -1.5, vy: 0, minX: 2350, maxX: 2720 }
     ]
   },
   {
-    sky: "#0284c7", groundTop: "#f8fafc", groundBody: "#64748b",
+    sky: "#0070ec", groundTop: "#ffffff", groundBody: "#7c7c7c",
     flagX: 3000,
     platforms: [
       { x: 0, y: 400, w: 500, h: 50, type: 'ground' },
@@ -467,10 +611,10 @@ const LEVELS = [
     ],
     enemies: [
       { type: 'goomba', x: 380, y: 368, w: 32, h: 32, vx: -1.5, minX: 200, maxX: 480 },
-      { type: 'flyer', x: 1050, y: 180, baseY: 180, w: 34, h: 26, vx: -1.8, minX: 850, maxX: 1380, phase: 0 },
-      { type: 'spiky', x: 1850, y: 370, w: 34, h: 30, vx: -1.8, minX: 1550, maxX: 2100 },
+      { type: 'flyer', x: 1050, y: 180, baseY: 180, w: 36, h: 26, vx: -1.8, minX: 850, maxX: 1380, phase: 0 },
+      { type: 'spiky', x: 1850, y: 368, w: 36, h: 32, vx: -1.8, minX: 1550, maxX: 2100 },
       { type: 'jumper', x: 2000, y: 368, w: 32, h: 32, vx: -1.6, vy: 0, minX: 1600, maxX: 2120 },
-      { type: 'flyer', x: 2450, y: 220, baseY: 220, w: 34, h: 26, vx: -1.9, minX: 2280, maxX: 2650, phase: 2 }
+      { type: 'flyer', x: 2450, y: 220, baseY: 220, w: 36, h: 26, vx: -1.9, minX: 2280, maxX: 2650, phase: 2 }
     ]
   }
 ];
@@ -485,14 +629,14 @@ function loadLevel(lvlNum) {
   currentLevel = lvlNum;
   currentTheme = LEVELS[lvlNum - 1];
   player.x = 60; player.y = 200; player.vx = 0; player.vy = 0;
-  player.grounded = false; player.jumpCount = 0;
+  player.grounded = false; player.jumpCount = 0; player.facing = 1;
   cameraX = 0;
   gameOver = false;
   levelCleared = false;
   jumpEffects = [];
 
   platforms = currentTheme.platforms.map(p => ({ ...p }));
-  coins = currentTheme.coins.map(c => ({ x: c.x, y: c.y, r: 10, collected: false }));
+  coins = currentTheme.coins.map(c => ({ x: c.x, y: c.y, r: 11, collected: false }));
   enemies = currentTheme.enemies.map(e => ({ ...e, alive: true }));
   flag.x = currentTheme.flagX;
 
@@ -500,7 +644,7 @@ function loadLevel(lvlNum) {
 }
 
 function updateHUD() {
-  levelEl.textContent = `${currentLevel} / ${MAX_LEVELS}`;
+  levelEl.textContent = `${currentLevel}/${MAX_LEVELS}`;
   scoreEl.textContent = score;
   coinsEl.textContent = coinCount;
 }
@@ -512,7 +656,7 @@ function triggerJump() {
     player.grounded = false;
     player.jumpCount++;
     if (player.jumpCount === 2) {
-      jumpEffects.push({ x: player.x + player.width / 2, y: player.y + player.height, r: 6, alpha: 1 });
+      jumpEffects.push({ x: player.x + player.width / 2, y: player.y + player.height, size: 12, alpha: 1 });
     }
   }
 }
@@ -525,9 +669,17 @@ function checkCollision(a, b) {
 function update(dt) {
   if (!isGameRunning || gameOver || levelCleared || allCompleted) return;
 
-  if (keys.right) player.vx = player.speed;
-  else if (keys.left) player.vx = -player.speed;
-  else player.vx *= Math.pow(FRICTION, dt);
+  animTick += dt;
+
+  if (keys.right) {
+    player.vx = player.speed;
+    player.facing = 1;
+  } else if (keys.left) {
+    player.vx = -player.speed;
+    player.facing = -1;
+  } else {
+    player.vx *= Math.pow(FRICTION, dt);
+  }
 
   player.vy += GRAVITY * dt;
   player.x += player.vx * dt;
@@ -558,7 +710,7 @@ function update(dt) {
     }
   });
 
-  jumpEffects.forEach(ef => { ef.r += 1.5 * dt; ef.alpha -= 0.06 * dt; });
+  jumpEffects.forEach(ef => { ef.size += 1.6 * dt; ef.alpha -= 0.06 * dt; });
   jumpEffects = jumpEffects.filter(ef => ef.alpha > 0);
 
   if (player.y > canvas.height) gameOver = true;
@@ -629,6 +781,16 @@ function update(dt) {
   }
 }
 
+// RETRO PİKSEL ÇİZİM FONKSİYONLARI
+function drawPixelCloud(cx, cy) {
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(cx + 12, cy, 40, 12);
+  ctx.fillRect(cx + 4, cy + 12, 56, 12);
+  ctx.fillRect(cx, cy + 24, 64, 10);
+  ctx.fillStyle = '#cbd5e1';
+  ctx.fillRect(cx, cy + 32, 64, 4);
+}
+
 function draw() {
   if (!isGameRunning) return;
 
@@ -636,132 +798,140 @@ function draw() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.save();
-  ctx.translate(-cameraX, 0);
+  ctx.translate(-Math.floor(cameraX), 0);
 
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
-  [150, 600, 1100, 1650, 2200, 2750].forEach(cx => {
-    ctx.beginPath();
-    ctx.arc(cx, 80, 25, 0, Math.PI * 2);
-    ctx.arc(cx + 25, 75, 30, 0, Math.PI * 2);
-    ctx.arc(cx + 50, 80, 25, 0, Math.PI * 2);
-    ctx.fill();
+  // Retro Piksel Bulutlar
+  [140, 580, 1080, 1620, 2180, 2720].forEach(cx => {
+    drawPixelCloud(cx, 65);
   });
 
+  // Retro Piksel Platformlar
   platforms.forEach(p => {
     if (p.type === 'ground') {
       ctx.fillStyle = currentTheme.groundBody;
       ctx.fillRect(p.x, p.y, p.w, p.h);
+      // Toprak içi piksel benekleri
+      ctx.fillStyle = 'rgba(0,0,0,0.28)';
+      for (let gx = p.x + 8; gx < p.x + p.w - 8; gx += 24) {
+        ctx.fillRect(gx, p.y + 18, 8, 8);
+        ctx.fillRect(gx + 10, p.y + 32, 8, 8);
+      }
+      // Üst çimen katmanı
       ctx.fillStyle = currentTheme.groundTop;
-      ctx.fillRect(p.x, p.y, p.w, 10);
+      ctx.fillRect(p.x, p.y, p.w, 12);
+      ctx.fillStyle = '#000';
+      ctx.fillRect(p.x, p.y + 12, p.w, 2);
     } else if (p.type === 'brick') {
-      ctx.fillStyle = '#b84818';
+      ctx.fillStyle = '#c84c0c';
       ctx.fillRect(p.x, p.y, p.w, p.h);
+      // Tuğla derz çizgileri ve parlaklık
+      ctx.fillStyle = '#fca044';
+      ctx.fillRect(p.x, p.y, p.w, 3);
+      ctx.fillStyle = '#000';
       ctx.strokeStyle = '#000';
-      ctx.strokeRect(p.x, p.y, p.w, p.h);
-    } else if (p.type === 'pipe') {
-      ctx.fillStyle = '#16a34a';
-      ctx.fillRect(p.x, p.y, p.w, p.h);
-      ctx.strokeStyle = '#052e16';
       ctx.lineWidth = 2;
       ctx.strokeRect(p.x, p.y, p.w, p.h);
+      ctx.fillRect(p.x, p.y + 12, p.w, 2);
+      for (let bx = p.x + 25; bx < p.x + p.w; bx += 25) {
+        ctx.fillRect(bx, p.y, 2, 12);
+        ctx.fillRect(bx - 12, p.y + 12, 2, 13);
+      }
+    } else if (p.type === 'pipe') {
+      // Boru gövdesi + retro ışık şeridi
+      ctx.fillStyle = '#00a800';
+      ctx.fillRect(p.x + 4, p.y + 14, p.w - 8, p.h - 14);
+      ctx.fillStyle = '#80d010';
+      ctx.fillRect(p.x + 8, p.y + 14, 6, p.h - 14);
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(p.x + 4, p.y + 14, p.w - 8, p.h - 14);
+      // Boru üst ağzı
+      ctx.fillStyle = '#00a800';
+      ctx.fillRect(p.x, p.y, p.w, 14);
+      ctx.fillStyle = '#80d010';
+      ctx.fillRect(p.x + 5, p.y + 2, 8, 10);
+      ctx.strokeRect(p.x, p.y, p.w, 14);
     }
   });
 
+  // Piksel Altınlar
   coins.forEach(c => {
     if (!c.collected) {
-      ctx.fillStyle = '#ffd700';
-      ctx.beginPath();
-      ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#b8860b';
-      ctx.stroke();
+      const bob = Math.sin(animTick * 0.1 + c.x) * 2;
+      drawSprite(SPRITES.coin, c.x - 10, c.y - 10 + bob, 20, 20);
     }
   });
 
+  // Piksel Düşmanlar
   enemies.forEach(e => {
     if (!e.alive) return;
+    const flip = e.vx > 0;
     if (e.type === 'goomba') {
-      ctx.fillStyle = '#8b4513';
-      ctx.fillRect(e.x, e.y, e.w, e.h);
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(e.x + 6, e.y + 8, 6, 6);
-      ctx.fillRect(e.x + 20, e.y + 8, 6, 6);
+      drawSprite(SPRITES.goomba, e.x, e.y, e.w, e.h, Math.floor(animTick / 10) % 2 === 0);
     } else if (e.type === 'jumper') {
-      ctx.fillStyle = '#22c55e';
-      ctx.fillRect(e.x, e.y, e.w, e.h);
-      ctx.fillStyle = '#000';
-      ctx.fillRect(e.x + 6, e.y + 6, 6, 6);
-      ctx.fillRect(e.x + 20, e.y + 6, 6, 6);
+      drawSprite(SPRITES.jumper, e.x, e.y, e.w, e.h, flip);
     } else if (e.type === 'flyer') {
-      ctx.fillStyle = '#9333ea';
-      ctx.fillRect(e.x, e.y, e.w, e.h);
-      ctx.fillStyle = '#e9d5ff';
-      ctx.fillRect(e.x - 6, e.y + 4, 8, 10);
-      ctx.fillRect(e.x + e.w - 2, e.y + 4, 8, 10);
-      ctx.fillStyle = '#facc15';
-      ctx.fillRect(e.x + 8, e.y + 8, 5, 5);
-      ctx.fillRect(e.x + 21, e.y + 8, 5, 5);
+      drawSprite(SPRITES.flyer, e.x, e.y, e.w, e.h, flip);
     } else if (e.type === 'spiky') {
-      ctx.fillStyle = '#dc2626';
-      ctx.fillRect(e.x, e.y + 6, e.w, e.h - 6);
-      ctx.fillStyle = '#ffffff';
-      for (let i = 0; i < 3; i++) {
-        ctx.beginPath();
-        ctx.moveTo(e.x + 3 + i * 10, e.y + 6);
-        ctx.lineTo(e.x + 8 + i * 10, e.y - 4);
-        ctx.lineTo(e.x + 13 + i * 10, e.y + 6);
-        ctx.fill();
-      }
+      drawSprite(SPRITES.spiky, e.x, e.y, e.w, e.h, flip);
     }
   });
 
+  // Çift Zıplama Piksel Duman Kareleri
   jumpEffects.forEach(ef => {
-    ctx.strokeStyle = `rgba(255, 255, 255, ${ef.alpha})`;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.ellipse(ef.x, ef.y, ef.r * 1.8, ef.r * 0.5, 0, 0, Math.PI * 2);
-    ctx.stroke();
+    ctx.fillStyle = `rgba(255, 255, 255, ${ef.alpha})`;
+    ctx.fillRect(ef.x - ef.size, ef.y - 4, 8, 8);
+    ctx.fillRect(ef.x + ef.size - 8, ef.y - 4, 8, 8);
+    ctx.fillRect(ef.x - 4, ef.y + 2, 8, 6);
   });
 
+  // Retro Bitiş Direği ve Bayrağı
+  ctx.fillStyle = '#000';
+  ctx.fillRect(flag.x - 1, flag.y - 1, 8, flag.height + 2);
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(flag.x, flag.y, 6, flag.height);
+  ctx.fillStyle = '#fbd000';
+  ctx.fillRect(flag.x - 3, flag.y - 8, 12, 10);
   ctx.fillStyle = '#e52521';
-  ctx.beginPath();
-  ctx.moveTo(flag.x + 6, flag.y);
-  ctx.lineTo(flag.x + 65, flag.y + 25);
-  ctx.lineTo(flag.x + 6, flag.y + 50);
-  ctx.fill();
+  ctx.fillRect(flag.x + 6, flag.y + 4, 48, 32);
+  ctx.strokeStyle = '#000';
+  ctx.strokeRect(flag.x + 6, flag.y + 4, 48, 32);
 
-  ctx.fillStyle = '#e52521';
-  ctx.fillRect(player.x, player.y, player.width, player.height);
-  ctx.fillStyle = '#0058f8';
-  ctx.fillRect(player.x + 4, player.y + 20, player.width - 8, 22);
-  ctx.fillStyle = '#ffcc99';
-  ctx.fillRect(player.x + 8, player.y + 6, 18, 12);
+  // Piksel Oyuncu (Durma / Yürüme Animasyonu + Yön Çevirme)
+  const isMoving = Math.abs(player.vx) > 0.4 && player.grounded;
+  const activePlayerSprite = (isMoving && Math.floor(animTick / 6) % 2 === 1)
+    ? SPRITES.playerWalk
+    : SPRITES.playerIdle;
+  drawSprite(activePlayerSprite, player.x, player.y, player.width, player.height, player.facing === -1);
 
   ctx.restore();
 
+  // Retro Durum Ekranları
   if (gameOver || levelCleared || allCompleted) {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#fbd000';
     ctx.textAlign = 'center';
 
     if (allCompleted) {
-      ctx.font = 'bold 34px sans-serif';
-      ctx.fillText('EFSANE! TÜM 5 BÖLÜMÜ BİTİRDİN!', canvas.width / 2, canvas.height / 2 - 20);
-      ctx.font = '20px sans-serif';
-      ctx.fillText(`Toplam Skor: ${score} — Ana menüye dönmek için dokun`, canvas.width / 2, canvas.height / 2 + 25);
+      ctx.font = 'bold 30px "Courier New", monospace';
+      ctx.fillText('TUM 5 BOLUM TAMAMLANDI!', canvas.width / 2, canvas.height / 2 - 20);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 18px "Courier New", monospace';
+      ctx.fillText(`SKOR: ${score} - ANA MENU ICIN DOKUN`, canvas.width / 2, canvas.height / 2 + 25);
     } else if (levelCleared) {
-      ctx.font = 'bold 34px sans-serif';
-      ctx.fillText(`BÖLÜM ${currentLevel} TAMAMLANDI!`, canvas.width / 2, canvas.height / 2 - 20);
-      ctx.font = '20px sans-serif';
-      ctx.fillText(`Bölüm ${currentLevel + 1}'e geçmek için ekrana dokun`, canvas.width / 2, canvas.height / 2 + 25);
+      ctx.font = 'bold 30px "Courier New", monospace';
+      ctx.fillText(`BOLUM ${currentLevel} GECILDI!`, canvas.width / 2, canvas.height / 2 - 20);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 18px "Courier New", monospace';
+      ctx.fillText(`BOLUM ${currentLevel + 1} ICIN EKRANA DOKUN`, canvas.width / 2, canvas.height / 2 + 25);
     } else {
-      ctx.font = 'bold 36px sans-serif';
-      ctx.fillText('OYUN BİTTİ!', canvas.width / 2, canvas.height / 2 - 20);
-      ctx.font = '20px sans-serif';
-      ctx.fillText('Tekrar denemek için ekrana dokun', canvas.width / 2, canvas.height / 2 + 25);
+      ctx.fillStyle = '#e52521';
+      ctx.font = 'bold 34px "Courier New", monospace';
+      ctx.fillText('OYUN BITTI!', canvas.width / 2, canvas.height / 2 - 20);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 18px "Courier New", monospace';
+      ctx.fillText('TEKRAR DENEMEK ICIN DOKUN', canvas.width / 2, canvas.height / 2 + 25);
     }
   }
 }
