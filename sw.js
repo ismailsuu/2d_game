@@ -1,4 +1,4 @@
-const CACHE_NAME = 'js-mario-2d-game-v7';
+const CACHE_NAME = 'js-mario-2d-game-v8';
 const ASSETS = [
   '/2d_game/',
   '/2d_game/index.html',
