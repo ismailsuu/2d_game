@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#0f172a">
+  <meta name="theme-color" content="#090d16">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>2D Platform</title>
@@ -15,7 +15,7 @@
     html, body {
       width: 100%;
       height: 100dvh;
-      background-color: #0b0f19;
+      background-color: #090d16;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -23,13 +23,13 @@
       font-family: 'Courier New', Courier, monospace;
     }
 
-    /* RETRO PİKSEL ANA MENÜ */
+    /* ÖZGÜN RETRO SİBER ANA MENÜ */
     #main-menu {
       position: fixed;
       inset: 0;
       background:
-        repeating-linear-gradient(0deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 2px, transparent 2px, transparent 4px),
-        linear-gradient(180deg, #5c94fc 0%, #5c94fc 68%, #00a800 68%, #00a800 72%, #c84c0c 72%, #c84c0c 100%);
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.12) 0px, rgba(0,0,0,0.12) 2px, transparent 2px, transparent 4px),
+        linear-gradient(180deg, #0f172a 0%, #1e1b4b 68%, #06b6d4 68%, #06b6d4 71%, #1e293b 71%, #0f172a 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -41,8 +41,8 @@
     .game-title {
       font-size: clamp(32px, 6.5vw, 56px);
       font-weight: 900;
-      color: #fbd000;
-      text-shadow: 4px 4px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+      color: #38bdf8;
+      text-shadow: 4px 4px 0 #000, -2px -2px 0 #000, 0 0 18px rgba(56, 189, 248, 0.5);
       margin-bottom: 36px;
       letter-spacing: 3px;
     }
@@ -70,11 +70,11 @@
       box-shadow: inset 2px 2px 0 rgba(0,0,0,0.4), 1px 1px 0 #000;
     }
     #btn-continue {
-      background: #00a800;
+      background: #10b981;
       display: none;
     }
     #btn-new-game {
-      background: #e52521;
+      background: #6366f1;
     }
 
     /* OYUN SAHNESİ */
@@ -82,7 +82,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: #0b0f19;
+      background: #090d16;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -111,7 +111,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      color: #fff;
+      color: #e2e8f0;
       font-size: 15px;
       font-weight: 900;
       text-shadow: 2px 2px 0 #000;
@@ -120,9 +120,9 @@
     }
     #btn-in-game-menu {
       pointer-events: auto;
-      background: rgba(0, 0, 0, 0.55);
-      border: 2px solid #fff;
-      color: #fff;
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid #38bdf8;
+      color: #38bdf8;
       padding: 4px 8px;
       font-family: 'Courier New', Courier, monospace;
       font-size: 13px;
@@ -148,8 +148,8 @@
       width: 78px;
       height: 78px;
       border-radius: 6px;
-      background: rgba(255, 255, 255, 0.14);
-      border: 3px solid rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.12);
+      border: 3px solid rgba(56, 189, 248, 0.45);
       color: rgba(255, 255, 255, 0.9);
       font-family: 'Courier New', Courier, monospace;
       font-size: 30px;
@@ -160,11 +160,11 @@
       touch-action: manipulation;
       pointer-events: auto;
       text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.7);
-      box-shadow: inset -3px -3px 0 rgba(0,0,0,0.25), inset 3px 3px 0 rgba(255,255,255,0.2);
+      box-shadow: inset -3px -3px 0 rgba(0,0,0,0.25), inset 3px 3px 0 rgba(255,255,255,0.15);
     }
     .ctrl-btn:active {
-      background: rgba(255, 255, 255, 0.35);
-      border-color: #fff;
+      background: rgba(56, 189, 248, 0.35);
+      border-color: #38bdf8;
       transform: scale(0.95);
     }
 
@@ -227,7 +227,7 @@
       <div id="hud">
         <span>BÖLÜM:<span id="level">1/5</span></span>
         <span>SKOR:<span id="score">0</span></span>
-        <span>ALTIN:<span id="coins">0</span></span>
+        <span>KRİSTAL:<span id="coins">0</span></span>
         <button id="btn-in-game-menu">MENÜ</button>
       </div>
       <canvas id="gameCanvas" width="800" height="450"></canvas>
@@ -251,7 +251,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-const SAVE_KEY = 'js_mario_save_v1';
+const SAVE_KEY = 'cyber_knight_save_v1';
 const mainMenu = document.getElementById('main-menu');
 const gameStage = document.getElementById('game-stage');
 const btnContinue = document.getElementById('btn-continue');
@@ -292,115 +292,121 @@ const player = {
 
 let jumpEffects = [];
 
-// PİKSEL ART SPRITE MATRİSLERİ (8-Bit Retro Karakter ve Düşmanlar)
+// ÖZGÜN 8-BİT PİKSEL ART SPRİTELAR
 const SPRITES = {
-  playerIdle: {
-    palette: { R: '#e52521', S: '#ffcc99', B: '#0058f8', H: '#6b3e08', Y: '#fbd000' },
+  // Vizörlü Miğferli ve Atkılı Siber Şövalye (Durma)
+  heroIdle: {
+    palette: { A: '#e2e8f0', D: '#64748b', V: '#38bdf8', S: '#10b981', K: '#0f172a' },
     grid: [
-      '...RRRRR....',
-      '..RRRRRRRR..',
-      '..HHHSSHS...',
-      '.HSHSSSHSS..',
-      '.HSHHSSSHSS.',
-      '.HHSSSSHHHH.',
-      '...SSSSSS...',
-      '..RRBRRBR...',
-      '.RRRBRRBRR..',
-      'RRRRBBBBBRRR',
-      'SS.BYBBYB.SS',
-      'SS.BBBBBB.SS',
-      '...BBB.BBB..',
-      '..HHH...HHH.'
+      '...AAAAAA...',
+      '..AAAAAAAA..',
+      '..AAVVVVVV..',
+      '..AAVVVVVV..',
+      '...AAAAAA...',
+      '.SSSSSSSSSS.',
+      'SS.DDDDDD.SS',
+      'S..DDVVDD..S',
+      '...DDDDDD...',
+      '..AADDDDAA..',
+      '..AA.DD.AA..',
+      '.....AA.....',
+      '...AA..AA...',
+      '..KKK..KKK..'
     ]
   },
-  playerWalk: {
-    palette: { R: '#e52521', S: '#ffcc99', B: '#0058f8', H: '#6b3e08', Y: '#fbd000' },
+  // Siber Şövalye (Yürüme + Dalgalanan Atkı)
+  heroWalk: {
+    palette: { A: '#e2e8f0', D: '#64748b', V: '#38bdf8', S: '#10b981', K: '#0f172a' },
     grid: [
-      '...RRRRR....',
-      '..RRRRRRRR..',
-      '..HHHSSHS...',
-      '.HSHSSSHSS..',
-      '.HSHHSSSHSS.',
-      '.HHSSSSHHHH.',
-      '...SSSSSS...',
-      '..RRBRRBR...',
-      '.RRRBRRBRR..',
-      'RRRRBBBBBRRR',
-      'SS.BYBBYB.SS',
-      '...BBBBBB...',
-      '.HHH....BBB.',
-      '........HHH.'
+      '...AAAAAA...',
+      '..AAAAAAAA..',
+      '..AAVVVVVV..',
+      '..AAVVVVVV..',
+      '...AAAAAA...',
+      'SSSSSSSSSS..',
+      'S..DDDDDD...',
+      '...DDVVDD...',
+      '...DDDDDD...',
+      '..AADDDDAA..',
+      '.....DD.....',
+      '...AA..AA...',
+      '.KKK....AA..',
+      '........KKK.'
     ]
   },
-  goomba: {
-    palette: { B: '#c84c0c', D: '#5c2204', W: '#ffffff', K: '#000000', S: '#fca044' },
+  // Düşman 1: Tekerlekli Devriye Robotu
+  bot: {
+    palette: { M: '#94a3b8', D: '#475569', R: '#ef4444', Y: '#facc15', K: '#000000' },
     grid: [
-      '....BBBB....',
-      '...BBBBBB...',
-      '..BBBBBBBB..',
-      '.BBBBBBBBBB.',
-      'BBWKKBBKKWBB',
-      'BBWKKBBKKWBB',
-      'BBBBBBBBBBBB',
-      '.BBBBBBBBBB.',
-      '...SSSSSS...',
-      '..SSSSSSSS..',
-      '.DDD....DDD.',
-      'DDDD....DDDD'
+      '.....YY.....',
+      '.....MM.....',
+      '..MMMMMMMM..',
+      '.MDDDDDDDDM.',
+      '.MDDRRRRDDM.',
+      '.MDDRRRRDDM.',
+      '.MDDDDDDDDM.',
+      '..MMMMMMMM..',
+      '...DDDDDD...',
+      '..KKK..KKK..',
+      '.KKKK..KKKK.'
     ]
   },
-  jumper: {
-    palette: { G: '#00a800', L: '#80d010', W: '#ffffff', K: '#000000' },
+  // Düşman 2: Sıçrayan Plazma Küresi
+  plasma: {
+    palette: { C: '#06b6d4', L: '#a5f3fc', B: '#2563eb', W: '#ffffff' },
     grid: [
-      '..GGGGGGGG..',
-      '.GLLLLLLLLG.',
-      'GLLWWLLWWLLG',
-      'GLLWKLLWKLLG',
-      'GLLLLLLLLLLG',
-      'GLKKKKKKKKLG',
-      'GLLLLLLLLLLG',
-      '.GGGGGGGGGG.',
-      'GGG..GG..GGG',
-      'KKK......KKK'
+      '....CCCC....',
+      '..CCLLLLCC..',
+      '.CLLWWWWLLC.',
+      'CLWWCCCCWWLC',
+      'CLWCCBBCCWLC',
+      'CLWWCCCCWWLC',
+      '.CLLWWWWLLC.',
+      '..CCLLLLCC..',
+      '...C.CC.C...',
+      '..C......C..'
     ]
   },
-  flyer: {
-    palette: { P: '#9333ea', L: '#d8b4fe', W: '#ffffff', Y: '#fbd000', K: '#000000' },
+  // Düşman 3: Pervaneli Siber Drone
+  drone: {
+    palette: { W: '#f8fafc', D: '#334155', O: '#f97316', Y: '#facc15' },
     grid: [
-      'LL........LL',
-      'LLL..PP..LLL',
-      'LLLLPPPPLLLL',
-      '.LLPPWWPPLL.',
-      '..PPWKKWPP..',
-      '..PPPPPPPP..',
-      '...PPYYPP...',
-      '....P..P....'
+      'WWWW....WWWW',
+      '..DD....DD..',
+      '...DDDDDD...',
+      '.DDDDDDDDDD.',
+      'DDDDOOOODDDD',
+      'DDDDOYYODDDD',
+      '.DDDDDDDDDD.',
+      '...DD..DD...'
     ]
   },
-  spiky: {
-    palette: { W: '#ffffff', R: '#e52521', D: '#991b1b', Y: '#fbd000', K: '#000000' },
+  // Düşman 4: Yüksek Voltajlı Dikenli Mayın
+  mine: {
+    palette: { Y: '#facc15', D: '#1e293b', R: '#ef4444', M: '#64748b' },
     grid: [
-      '..W..WW..W..',
-      '.WW.WWWW.WW.',
-      '.RRRRRRRRRR.',
-      'RRRRRRRRRRRR',
-      'RRYYRRRRYYRR',
-      'RRYKRRRRYKRR',
-      'DDDDDDDDDDDD',
-      '.KKK....KKK.'
+      '..Y..YY..Y..',
+      '.YY.YYYY.YY.',
+      '..MMMMMMMM..',
+      '.MDDDDDDDDM.',
+      'MDDRRMMRRDDM',
+      'MDDRRMMRRDDM',
+      '.MDDDDDDDDM.',
+      'MMMMMMMMMMMM'
     ]
   },
-  coin: {
-    palette: { Y: '#fbd000', O: '#c84c0c', W: '#ffffff' },
+  // Toplanabilir Enerji Kristali
+  crystal: {
+    palette: { C: '#22d3ee', W: '#ffffff', B: '#0284c7' },
     grid: [
-      '..YYYY..',
-      '.YWWWWY.',
-      'YWYYYYOY',
-      'YWYOOYOY',
-      'YWYOOYOY',
-      'YWYYYYOY',
-      '.YYYYOY.',
-      '..OOOO..'
+      '...CC...',
+      '..CWWC..',
+      '.CWCCBC.',
+      'CWCCCCBC',
+      'CWCCCCBC',
+      '.CCCCCC.',
+      '..CBBBC.',
+      '...BB...'
     ]
   }
 };
@@ -487,21 +493,23 @@ btnContinue.addEventListener('click', () => {
 
 btnInGameMenu.addEventListener('click', returnToMenu);
 
-// 5 Farklı Bölüm (Retro Paletlerle)
+// 5 Özgün Dünya Atmosferi
 const LEVELS = [
+  // BÖLÜM 1: Kristal Vadi
   {
-    sky: "#5c94fc", groundTop: "#00a800", groundBody: "#c84c0c",
+    sky: "#1e3a8a", groundTop: "#10b981", groundBody: "#1e293b",
+    starColor: "rgba(255,255,255,0.4)",
     flagX: 2250,
     platforms: [
       { x: 0, y: 400, w: 700, h: 50, type: 'ground' },
       { x: 800, y: 400, w: 650, h: 50, type: 'ground' },
       { x: 1550, y: 400, w: 900, h: 50, type: 'ground' },
-      { x: 260, y: 280, w: 120, h: 25, type: 'brick' },
-      { x: 520, y: 200, w: 90, h: 25, type: 'brick' },
-      { x: 960, y: 260, w: 140, h: 25, type: 'brick' },
-      { x: 1250, y: 180, w: 100, h: 25, type: 'brick' },
-      { x: 430, y: 340, w: 48, h: 60, type: 'pipe' },
-      { x: 1140, y: 320, w: 48, h: 80, type: 'pipe' }
+      { x: 260, y: 280, w: 120, h: 24, type: 'metal' },
+      { x: 520, y: 200, w: 90, h: 24, type: 'metal' },
+      { x: 960, y: 260, w: 140, h: 24, type: 'metal' },
+      { x: 1250, y: 180, w: 100, h: 24, type: 'metal' },
+      { x: 430, y: 340, w: 44, h: 60, type: 'pillar' },
+      { x: 1140, y: 320, w: 44, h: 80, type: 'pillar' }
     ],
     coins: [
       { x: 280, y: 240 }, { x: 320, y: 240 }, { x: 360, y: 240 },
@@ -509,25 +517,27 @@ const LEVELS = [
       { x: 1300, y: 130 }, { x: 1750, y: 350 }, { x: 1800, y: 350 }
     ],
     enemies: [
-      { type: 'goomba', x: 500, y: 368, w: 32, h: 32, vx: -1.1, minX: 480, maxX: 680 },
-      { type: 'goomba', x: 1020, y: 368, w: 32, h: 32, vx: -1.3, minX: 820, maxX: 1120 },
-      { type: 'jumper', x: 1700, y: 368, w: 32, h: 32, vx: -1.0, vy: 0, minX: 1600, maxX: 2000 }
+      { type: 'bot', x: 500, y: 368, w: 32, h: 32, vx: -1.1, minX: 480, maxX: 680 },
+      { type: 'bot', x: 1020, y: 368, w: 32, h: 32, vx: -1.3, minX: 820, maxX: 1120 },
+      { type: 'plasma', x: 1700, y: 368, w: 32, h: 32, vx: -1.0, vy: 0, minX: 1600, maxX: 2000 }
     ]
   },
+  // BÖLÜM 2: Kızıl Kanyon
   {
-    sky: "#d85800", groundTop: "#80d010", groundBody: "#7c3000",
+    sky: "#4c1d95", groundTop: "#f59e0b", groundBody: "#31102f",
+    starColor: "rgba(253,224,71,0.45)",
     flagX: 2500,
     platforms: [
       { x: 0, y: 400, w: 600, h: 50, type: 'ground' },
       { x: 730, y: 400, w: 500, h: 50, type: 'ground' },
       { x: 1380, y: 400, w: 550, h: 50, type: 'ground' },
       { x: 2080, y: 400, w: 600, h: 50, type: 'ground' },
-      { x: 240, y: 270, w: 100, h: 25, type: 'brick' },
-      { x: 440, y: 180, w: 100, h: 25, type: 'brick' },
-      { x: 860, y: 250, w: 130, h: 25, type: 'brick' },
-      { x: 1520, y: 240, w: 120, h: 25, type: 'brick' },
-      { x: 1740, y: 160, w: 110, h: 25, type: 'brick' },
-      { x: 1080, y: 330, w: 48, h: 70, type: 'pipe' }
+      { x: 240, y: 270, w: 100, h: 24, type: 'metal' },
+      { x: 440, y: 180, w: 100, h: 24, type: 'metal' },
+      { x: 860, y: 250, w: 130, h: 24, type: 'metal' },
+      { x: 1520, y: 240, w: 120, h: 24, type: 'metal' },
+      { x: 1740, y: 160, w: 110, h: 24, type: 'metal' },
+      { x: 1080, y: 330, w: 44, h: 70, type: 'pillar' }
     ],
     coins: [
       { x: 470, y: 140 }, { x: 510, y: 140 }, { x: 665, y: 220 },
@@ -535,25 +545,27 @@ const LEVELS = [
       { x: 1770, y: 120 }, { x: 1810, y: 120 }, { x: 2005, y: 200 }
     ],
     enemies: [
-      { type: 'flyer', x: 650, y: 240, baseY: 240, w: 36, h: 26, vx: -1.4, minX: 520, maxX: 820, phase: 0 },
-      { type: 'goomba', x: 950, y: 368, w: 32, h: 32, vx: -1.4, minX: 750, maxX: 1060 },
-      { type: 'flyer', x: 1300, y: 220, baseY: 220, w: 36, h: 26, vx: -1.6, minX: 1150, maxX: 1480, phase: 1.5 },
-      { type: 'jumper', x: 1650, y: 368, w: 32, h: 32, vx: -1.2, vy: 0, minX: 1420, maxX: 1900 }
+      { type: 'drone', x: 650, y: 240, baseY: 240, w: 36, h: 26, vx: -1.4, minX: 520, maxX: 820, phase: 0 },
+      { type: 'bot', x: 950, y: 368, w: 32, h: 32, vx: -1.4, minX: 750, maxX: 1060 },
+      { type: 'drone', x: 1300, y: 220, baseY: 220, w: 36, h: 26, vx: -1.6, minX: 1150, maxX: 1480, phase: 1.5 },
+      { type: 'plasma', x: 1650, y: 368, w: 32, h: 32, vx: -1.2, vy: 0, minX: 1420, maxX: 1900 }
     ]
   },
+  // BÖLÜM 3: Yeraltı Laboratuvarı
   {
-    sky: "#000038", groundTop: "#3858d8", groundBody: "#182878",
+    sky: "#090d16", groundTop: "#38bdf8", groundBody: "#1e293b",
+    starColor: "rgba(56,189,248,0.4)",
     flagX: 2650,
     platforms: [
       { x: 0, y: 400, w: 680, h: 50, type: 'ground' },
       { x: 820, y: 400, w: 680, h: 50, type: 'ground' },
       { x: 1640, y: 400, w: 1200, h: 50, type: 'ground' },
-      { x: 250, y: 270, w: 130, h: 25, type: 'brick' },
-      { x: 520, y: 210, w: 110, h: 25, type: 'brick' },
-      { x: 950, y: 260, w: 150, h: 25, type: 'brick' },
-      { x: 1220, y: 190, w: 120, h: 25, type: 'brick' },
-      { x: 1850, y: 260, w: 140, h: 25, type: 'brick' },
-      { x: 2100, y: 190, w: 140, h: 25, type: 'brick' }
+      { x: 250, y: 270, w: 130, h: 24, type: 'metal' },
+      { x: 520, y: 210, w: 110, h: 24, type: 'metal' },
+      { x: 950, y: 260, w: 150, h: 24, type: 'metal' },
+      { x: 1220, y: 190, w: 120, h: 24, type: 'metal' },
+      { x: 1850, y: 260, w: 140, h: 24, type: 'metal' },
+      { x: 2100, y: 190, w: 140, h: 24, type: 'metal' }
     ],
     coins: [
       { x: 290, y: 230 }, { x: 330, y: 230 }, { x: 560, y: 170 },
@@ -561,22 +573,24 @@ const LEVELS = [
       { x: 1900, y: 220 }, { x: 2150, y: 150 }, { x: 2190, y: 150 }
     ],
     enemies: [
-      { type: 'spiky', x: 450, y: 368, w: 36, h: 32, vx: -1.3, minX: 240, maxX: 650 },
-      { type: 'spiky', x: 1150, y: 368, w: 36, h: 32, vx: -1.5, minX: 850, maxX: 1450 },
-      { type: 'flyer', x: 1560, y: 230, baseY: 230, w: 36, h: 26, vx: -1.5, minX: 1420, maxX: 1720, phase: 0 },
-      { type: 'spiky', x: 2050, y: 368, w: 36, h: 32, vx: -1.6, minX: 1750, maxX: 2400 }
+      { type: 'mine', x: 450, y: 368, w: 36, h: 32, vx: -1.3, minX: 240, maxX: 650 },
+      { type: 'mine', x: 1150, y: 368, w: 36, h: 32, vx: -1.5, minX: 850, maxX: 1450 },
+      { type: 'drone', x: 1560, y: 230, baseY: 230, w: 36, h: 26, vx: -1.5, minX: 1420, maxX: 1720, phase: 0 },
+      { type: 'mine', x: 2050, y: 368, w: 36, h: 32, vx: -1.6, minX: 1750, maxX: 2400 }
     ]
   },
+  // BÖLÜM 4: Magma Reaktörü
   {
-    sky: "#280000", groundTop: "#e52521", groundBody: "#3c3c3c",
+    sky: "#2a0808", groundTop: "#ef4444", groundBody: "#18181b",
+    starColor: "rgba(248,113,113,0.45)",
     flagX: 2800,
     platforms: [
       { x: 0, y: 400, w: 480, h: 50, type: 'ground' },
-      { x: 640, y: 360, w: 160, h: 25, type: 'brick' },
-      { x: 960, y: 320, w: 160, h: 25, type: 'brick' },
+      { x: 640, y: 360, w: 160, h: 24, type: 'metal' },
+      { x: 960, y: 320, w: 160, h: 24, type: 'metal' },
       { x: 1260, y: 400, w: 580, h: 50, type: 'ground' },
-      { x: 1450, y: 250, w: 120, h: 25, type: 'brick' },
-      { x: 2000, y: 350, w: 150, h: 25, type: 'brick' },
+      { x: 1450, y: 250, w: 120, h: 24, type: 'metal' },
+      { x: 2000, y: 350, w: 150, h: 24, type: 'metal' },
       { x: 2300, y: 400, w: 700, h: 50, type: 'ground' }
     ],
     coins: [
@@ -585,23 +599,25 @@ const LEVELS = [
       { x: 2070, y: 300 }, { x: 2220, y: 240 }, { x: 2500, y: 350 }
     ],
     enemies: [
-      { type: 'jumper', x: 350, y: 368, w: 32, h: 32, vx: -1.3, vy: 0, minX: 200, maxX: 460 },
-      { type: 'flyer', x: 860, y: 210, baseY: 210, w: 36, h: 26, vx: -1.7, minX: 660, maxX: 1120, phase: 0.8 },
-      { type: 'spiky', x: 1600, y: 368, w: 36, h: 32, vx: -1.7, minX: 1300, maxX: 1800 },
-      { type: 'jumper', x: 2550, y: 368, w: 32, h: 32, vx: -1.5, vy: 0, minX: 2350, maxX: 2720 }
+      { type: 'plasma', x: 350, y: 368, w: 32, h: 32, vx: -1.3, vy: 0, minX: 200, maxX: 460 },
+      { type: 'drone', x: 860, y: 210, baseY: 210, w: 36, h: 26, vx: -1.7, minX: 660, maxX: 1120, phase: 0.8 },
+      { type: 'mine', x: 1600, y: 368, w: 36, h: 32, vx: -1.7, minX: 1300, maxX: 1800 },
+      { type: 'plasma', x: 2550, y: 368, w: 32, h: 32, vx: -1.5, vy: 0, minX: 2350, maxX: 2720 }
     ]
   },
+  // BÖLÜM 5: Yıldız İniş Üssü
   {
-    sky: "#0070ec", groundTop: "#ffffff", groundBody: "#7c7c7c",
+    sky: "#0f172a", groundTop: "#e2e8f0", groundBody: "#334155",
+    starColor: "rgba(255,255,255,0.65)",
     flagX: 3000,
     platforms: [
       { x: 0, y: 400, w: 500, h: 50, type: 'ground' },
-      { x: 650, y: 340, w: 140, h: 25, type: 'brick' },
-      { x: 940, y: 270, w: 140, h: 25, type: 'brick' },
-      { x: 1230, y: 200, w: 150, h: 25, type: 'brick' },
+      { x: 650, y: 340, w: 140, h: 24, type: 'metal' },
+      { x: 940, y: 270, w: 140, h: 24, type: 'metal' },
+      { x: 1230, y: 200, w: 150, h: 24, type: 'metal' },
       { x: 1520, y: 400, w: 620, h: 50, type: 'ground' },
-      { x: 1750, y: 260, w: 130, h: 25, type: 'brick' },
-      { x: 2300, y: 340, w: 150, h: 25, type: 'brick' },
+      { x: 1750, y: 260, w: 130, h: 24, type: 'metal' },
+      { x: 2300, y: 340, w: 150, h: 24, type: 'metal' },
       { x: 2600, y: 400, w: 600, h: 50, type: 'ground' }
     ],
     coins: [
@@ -610,11 +626,11 @@ const LEVELS = [
       { x: 2375, y: 290 }, { x: 2520, y: 240 }, { x: 2800, y: 350 }
     ],
     enemies: [
-      { type: 'goomba', x: 380, y: 368, w: 32, h: 32, vx: -1.5, minX: 200, maxX: 480 },
-      { type: 'flyer', x: 1050, y: 180, baseY: 180, w: 36, h: 26, vx: -1.8, minX: 850, maxX: 1380, phase: 0 },
-      { type: 'spiky', x: 1850, y: 368, w: 36, h: 32, vx: -1.8, minX: 1550, maxX: 2100 },
-      { type: 'jumper', x: 2000, y: 368, w: 32, h: 32, vx: -1.6, vy: 0, minX: 1600, maxX: 2120 },
-      { type: 'flyer', x: 2450, y: 220, baseY: 220, w: 36, h: 26, vx: -1.9, minX: 2280, maxX: 2650, phase: 2 }
+      { type: 'bot', x: 380, y: 368, w: 32, h: 32, vx: -1.5, minX: 200, maxX: 480 },
+      { type: 'drone', x: 1050, y: 180, baseY: 180, w: 36, h: 26, vx: -1.8, minX: 850, maxX: 1380, phase: 0 },
+      { type: 'mine', x: 1850, y: 368, w: 36, h: 32, vx: -1.8, minX: 1550, maxX: 2100 },
+      { type: 'plasma', x: 2000, y: 368, w: 32, h: 32, vx: -1.6, vy: 0, minX: 1600, maxX: 2120 },
+      { type: 'drone', x: 2450, y: 220, baseY: 220, w: 36, h: 26, vx: -1.9, minX: 2280, maxX: 2650, phase: 2 }
     ]
   }
 ];
@@ -622,7 +638,7 @@ const LEVELS = [
 let platforms = [];
 let coins = [];
 let enemies = [];
-let flag = { x: 2250, y: 150, width: 15, height: 250 };
+let portal = { x: 2250, y: 290, width: 44, height: 110 };
 let currentTheme = LEVELS[0];
 
 function loadLevel(lvlNum) {
@@ -638,7 +654,7 @@ function loadLevel(lvlNum) {
   platforms = currentTheme.platforms.map(p => ({ ...p }));
   coins = currentTheme.coins.map(c => ({ x: c.x, y: c.y, r: 11, collected: false }));
   enemies = currentTheme.enemies.map(e => ({ ...e, alive: true }));
-  flag.x = currentTheme.flagX;
+  portal.x = currentTheme.flagX;
 
   updateHUD();
 }
@@ -715,6 +731,7 @@ function update(dt) {
 
   if (player.y > canvas.height) gameOver = true;
 
+  // Enerji Kristali Toplama
   coins.forEach(c => {
     if (!c.collected) {
       let box = { x: c.x - c.r, y: c.y - c.r, w: c.r * 2, h: c.r * 2 };
@@ -727,13 +744,14 @@ function update(dt) {
     }
   });
 
+  // Düşman Hareketleri
   enemies.forEach(e => {
     if (!e.alive) return;
 
-    if (e.type === 'goomba' || e.type === 'spiky') {
+    if (e.type === 'bot' || e.type === 'mine') {
       e.x += e.vx * dt;
       if (e.x <= e.minX || e.x + e.w >= e.maxX) e.vx *= -1;
-    } else if (e.type === 'jumper') {
+    } else if (e.type === 'plasma') {
       e.x += e.vx * dt;
       if (e.x <= e.minX || e.x + e.w >= e.maxX) e.vx *= -1;
       e.vy += 0.4 * dt;
@@ -742,7 +760,7 @@ function update(dt) {
         e.y = 368;
         e.vy = -8.5;
       }
-    } else if (e.type === 'flyer') {
+    } else if (e.type === 'drone') {
       e.x += e.vx * dt;
       if (e.x <= e.minX || e.x + e.w >= e.maxX) e.vx *= -1;
       e.phase += 0.06 * dt;
@@ -750,7 +768,7 @@ function update(dt) {
     }
 
     if (checkCollision(player, e)) {
-      if (e.type === 'spiky') {
+      if (e.type === 'mine') {
         gameOver = true;
       } else if (player.vy > 0 && prevBottom <= e.y + 16) {
         e.alive = false;
@@ -764,7 +782,8 @@ function update(dt) {
     }
   });
 
-  if (checkCollision(player, { x: flag.x, y: flag.y, w: flag.width, h: flag.height })) {
+  // Işınlanma Portalı Kontrolü
+  if (checkCollision(player, { x: portal.x, y: portal.y, w: portal.width, h: portal.height })) {
     score += 1000;
     updateHUD();
     if (currentLevel < MAX_LEVELS) {
@@ -781,136 +800,136 @@ function update(dt) {
   }
 }
 
-// RETRO PİKSEL ÇİZİM FONKSİYONLARI
-function drawPixelCloud(cx, cy) {
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(cx + 12, cy, 40, 12);
-  ctx.fillRect(cx + 4, cy + 12, 56, 12);
-  ctx.fillRect(cx, cy + 24, 64, 10);
-  ctx.fillStyle = '#cbd5e1';
-  ctx.fillRect(cx, cy + 32, 64, 4);
-}
-
+// ÖZGÜN RETRO SİBER-PİKSEL ÇİZİM FONKSİYONLARI
 function draw() {
   if (!isGameRunning) return;
 
   ctx.fillStyle = currentTheme.sky;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  // Uzak Arka Plan Yıldızları ve Piksel Dağ Silüetleri (Paralaks)
+  ctx.fillStyle = currentTheme.starColor;
+  for (let i = 0; i < 35; i++) {
+    const sx = ((i * 197) - Math.floor(cameraX * 0.2)) % 900;
+    const drawX = sx < 0 ? sx + 900 : sx;
+    const sy = (i * 73) % 240 + 20;
+    ctx.fillRect(drawX, sy, 4, 4);
+  }
+
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+  for (let m = 0; m < 8; m++) {
+    const mx = m * 240 - Math.floor(cameraX * 0.35);
+    ctx.fillRect(mx + 40, 290, 120, 110);
+    ctx.fillRect(mx + 65, 250, 70, 40);
+    ctx.fillRect(mx + 85, 220, 30, 30);
+  }
+
   ctx.save();
   ctx.translate(-Math.floor(cameraX), 0);
 
-  // Retro Piksel Bulutlar
-  [140, 580, 1080, 1620, 2180, 2720].forEach(cx => {
-    drawPixelCloud(cx, 65);
-  });
-
-  // Retro Piksel Platformlar
+  // Platformlar, Metal Bloklar ve Enerji Sütunları
   platforms.forEach(p => {
     if (p.type === 'ground') {
       ctx.fillStyle = currentTheme.groundBody;
       ctx.fillRect(p.x, p.y, p.w, p.h);
-      // Toprak içi piksel benekleri
-      ctx.fillStyle = 'rgba(0,0,0,0.28)';
-      for (let gx = p.x + 8; gx < p.x + p.w - 8; gx += 24) {
-        ctx.fillRect(gx, p.y + 18, 8, 8);
-        ctx.fillRect(gx + 10, p.y + 32, 8, 8);
+      // Metalik / Kaya Izgara Deseni
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      for (let gx = p.x + 8; gx < p.x + p.w - 8; gx += 32) {
+        ctx.fillRect(gx, p.y + 16, 16, 10);
+        ctx.fillRect(gx + 8, p.y + 30, 16, 10);
       }
-      // Üst çimen katmanı
+      // Üst Neon / Toprak Şeridi
       ctx.fillStyle = currentTheme.groundTop;
-      ctx.fillRect(p.x, p.y, p.w, 12);
+      ctx.fillRect(p.x, p.y, p.w, 10);
       ctx.fillStyle = '#000';
-      ctx.fillRect(p.x, p.y + 12, p.w, 2);
-    } else if (p.type === 'brick') {
-      ctx.fillStyle = '#c84c0c';
+      ctx.fillRect(p.x, p.y + 10, p.w, 2);
+    } else if (p.type === 'metal') {
+      // Çelik Perçinli Platform
+      ctx.fillStyle = '#475569';
       ctx.fillRect(p.x, p.y, p.w, p.h);
-      // Tuğla derz çizgileri ve parlaklık
-      ctx.fillStyle = '#fca044';
-      ctx.fillRect(p.x, p.y, p.w, 3);
-      ctx.fillStyle = '#000';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillRect(p.x, p.y, p.w, 4);
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(p.x, p.y + p.h - 4, p.w, 4);
       ctx.strokeStyle = '#000';
       ctx.lineWidth = 2;
       ctx.strokeRect(p.x, p.y, p.w, p.h);
-      ctx.fillRect(p.x, p.y + 12, p.w, 2);
-      for (let bx = p.x + 25; bx < p.x + p.w; bx += 25) {
-        ctx.fillRect(bx, p.y, 2, 12);
-        ctx.fillRect(bx - 12, p.y + 12, 2, 13);
+      // Perçin noktaları
+      ctx.fillStyle = '#cbd5e1';
+      for (let rx = p.x + 8; rx < p.x + p.w - 6; rx += 22) {
+        ctx.fillRect(rx, p.y + 9, 4, 4);
       }
-    } else if (p.type === 'pipe') {
-      // Boru gövdesi + retro ışık şeridi
-      ctx.fillStyle = '#00a800';
-      ctx.fillRect(p.x + 4, p.y + 14, p.w - 8, p.h - 14);
-      ctx.fillStyle = '#80d010';
-      ctx.fillRect(p.x + 8, p.y + 14, 6, p.h - 14);
+    } else if (p.type === 'pillar') {
+      // Parlayan Enerji Sütunu
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(p.x, p.y, p.w, p.h);
+      ctx.fillStyle = '#06b6d4';
+      ctx.fillRect(p.x + 8, p.y + 8, p.w - 16, p.h - 8);
+      ctx.fillStyle = '#a5f3fc';
+      ctx.fillRect(p.x + 14, p.y + 8, 6, p.h - 8);
       ctx.strokeStyle = '#000';
       ctx.lineWidth = 2;
-      ctx.strokeRect(p.x + 4, p.y + 14, p.w - 8, p.h - 14);
-      // Boru üst ağzı
-      ctx.fillStyle = '#00a800';
-      ctx.fillRect(p.x, p.y, p.w, 14);
-      ctx.fillStyle = '#80d010';
-      ctx.fillRect(p.x + 5, p.y + 2, 8, 10);
-      ctx.strokeRect(p.x, p.y, p.w, 14);
+      ctx.strokeRect(p.x, p.y, p.w, p.h);
     }
   });
 
-  // Piksel Altınlar
+  // Enerji Kristalleri
   coins.forEach(c => {
     if (!c.collected) {
-      const bob = Math.sin(animTick * 0.1 + c.x) * 2;
-      drawSprite(SPRITES.coin, c.x - 10, c.y - 10 + bob, 20, 20);
+      const bob = Math.sin(animTick * 0.1 + c.x) * 3;
+      drawSprite(SPRITES.crystal, c.x - 10, c.y - 10 + bob, 20, 20);
     }
   });
 
-  // Piksel Düşmanlar
+  // Düşmanlar
   enemies.forEach(e => {
     if (!e.alive) return;
     const flip = e.vx > 0;
-    if (e.type === 'goomba') {
-      drawSprite(SPRITES.goomba, e.x, e.y, e.w, e.h, Math.floor(animTick / 10) % 2 === 0);
-    } else if (e.type === 'jumper') {
-      drawSprite(SPRITES.jumper, e.x, e.y, e.w, e.h, flip);
-    } else if (e.type === 'flyer') {
-      drawSprite(SPRITES.flyer, e.x, e.y, e.w, e.h, flip);
-    } else if (e.type === 'spiky') {
-      drawSprite(SPRITES.spiky, e.x, e.y, e.w, e.h, flip);
+    if (e.type === 'bot') {
+      drawSprite(SPRITES.bot, e.x, e.y, e.w, e.h, flip);
+    } else if (e.type === 'plasma') {
+      drawSprite(SPRITES.plasma, e.x, e.y, e.w, e.h, Math.floor(animTick / 8) % 2 === 0);
+    } else if (e.type === 'drone') {
+      drawSprite(SPRITES.drone, e.x, e.y, e.w, e.h, flip);
+    } else if (e.type === 'mine') {
+      drawSprite(SPRITES.mine, e.x, e.y, e.w, e.h, flip);
     }
   });
 
-  // Çift Zıplama Piksel Duman Kareleri
+  // Çift Zıplama Enerji Dalgası
   jumpEffects.forEach(ef => {
-    ctx.fillStyle = `rgba(255, 255, 255, ${ef.alpha})`;
-    ctx.fillRect(ef.x - ef.size, ef.y - 4, 8, 8);
-    ctx.fillRect(ef.x + ef.size - 8, ef.y - 4, 8, 8);
-    ctx.fillRect(ef.x - 4, ef.y + 2, 8, 6);
+    ctx.fillStyle = `rgba(56, 189, 248, ${ef.alpha})`;
+    ctx.fillRect(ef.x - ef.size, ef.y - 4, 10, 6);
+    ctx.fillRect(ef.x + ef.size - 10, ef.y - 4, 10, 6);
+    ctx.fillRect(ef.x - 5, ef.y + 2, 10, 5);
   });
 
-  // Retro Bitiş Direği ve Bayrağı
-  ctx.fillStyle = '#000';
-  ctx.fillRect(flag.x - 1, flag.y - 1, 8, flag.height + 2);
+  // Bitiş Işınlanma Portalı (Warp Gate)
+  ctx.fillStyle = '#334155';
+  ctx.fillRect(portal.x, portal.y, 8, portal.height);
+  ctx.fillRect(portal.x + portal.width - 8, portal.y, 8, portal.height);
+  ctx.fillRect(portal.x, portal.y, portal.width, 10);
+  // İç enerji alanı
+  const pulse = Math.floor(animTick / 6) % 2 === 0;
+  ctx.fillStyle = pulse ? '#38bdf8' : '#818cf8';
+  ctx.fillRect(portal.x + 8, portal.y + 10, portal.width - 16, portal.height - 10);
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(flag.x, flag.y, 6, flag.height);
-  ctx.fillStyle = '#fbd000';
-  ctx.fillRect(flag.x - 3, flag.y - 8, 12, 10);
-  ctx.fillStyle = '#e52521';
-  ctx.fillRect(flag.x + 6, flag.y + 4, 48, 32);
-  ctx.strokeStyle = '#000';
-  ctx.strokeRect(flag.x + 6, flag.y + 4, 48, 32);
+  ctx.fillRect(portal.x + 16, portal.y + 16, 6, portal.height - 22);
 
-  // Piksel Oyuncu (Durma / Yürüme Animasyonu + Yön Çevirme)
+  // Siber Şövalye (Oyuncu)
   const isMoving = Math.abs(player.vx) > 0.4 && player.grounded;
-  const activePlayerSprite = (isMoving && Math.floor(animTick / 6) % 2 === 1)
-    ? SPRITES.playerWalk
-    : SPRITES.playerIdle;
-  drawSprite(activePlayerSprite, player.x, player.y, player.width, player.height, player.facing === -1);
+  const activeHero = (isMoving && Math.floor(animTick / 6) % 2 === 1)
+    ? SPRITES.heroWalk
+    : SPRITES.heroIdle;
+  drawSprite(activeHero, player.x, player.y, player.width, player.height, player.facing === -1);
 
   ctx.restore();
 
-  // Retro Durum Ekranları
+  // Durum Ekranları
   if (gameOver || levelCleared || allCompleted) {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    ctx.fillStyle = 'rgba(9, 13, 22, 0.85)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#fbd000';
+    ctx.fillStyle = '#38bdf8';
     ctx.textAlign = 'center';
 
     if (allCompleted) {
@@ -926,7 +945,7 @@ function draw() {
       ctx.font = 'bold 18px "Courier New", monospace';
       ctx.fillText(`BOLUM ${currentLevel + 1} ICIN EKRANA DOKUN`, canvas.width / 2, canvas.height / 2 + 25);
     } else {
-      ctx.fillStyle = '#e52521';
+      ctx.fillStyle = '#ef4444';
       ctx.font = 'bold 34px "Courier New", monospace';
       ctx.fillText('OYUN BITTI!', canvas.width / 2, canvas.height / 2 - 20);
       ctx.fillStyle = '#fff';
