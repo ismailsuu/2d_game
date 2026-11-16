@@ -1,4 +1,4 @@
-const CACHE_NAME = '2d-platform-v14';
+const CACHE_NAME = '2d-platform-v15';
 const ASSETS = [
   '/2d_game/',
   '/2d_game/index.html',
