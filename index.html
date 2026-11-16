@@ -13,7 +13,7 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
     html, body {
-      width: 100vw;
+      width: 100%;
       height: 100dvh;
       background-color: #0f172a;
       display: flex;
@@ -23,7 +23,7 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    /* ANA MENÜ EKRANI */
+    /* ANA MENÜ */
     #main-menu {
       position: fixed;
       inset: 0;
@@ -74,27 +74,23 @@
       background: #ef4444;
     }
 
-    /* OYUN SAHNESİ (Ekrana Tam Oturan Düzen) */
+    /* OYUN SAHNESİ (Varsayılan / Masaüstü Düzeni) */
     #game-stage {
       display: none;
       position: fixed;
       inset: 0;
-      width: 100vw;
-      height: 100dvh;
       background: #0f172a;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
     }
-
     #game-container {
       position: relative;
       width: 100%;
-      height: 100%;
       max-width: 800px;
-      max-height: 450px;
       aspect-ratio: 16 / 9;
       box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      transition: all 0.25s ease;
     }
     canvas {
       width: 100%;
@@ -118,7 +114,7 @@
     }
     #btn-in-game-menu {
       pointer-events: auto;
-      background: rgba(15, 23, 42, 0.5);
+      background: rgba(15, 23, 42, 0.55);
       border: 1.5px solid rgba(255, 255, 255, 0.6);
       color: white;
       padding: 4px 10px;
@@ -128,15 +124,12 @@
       cursor: pointer;
     }
 
-    /* BÜYÜK VE ŞEFFAF MOBİL KONTROLLER */
+    /* MOBİL KONTROLLER */
     #mobile-controls {
       display: none;
-      position: fixed;
-      bottom: max(18px, env(safe-area-inset-bottom));
-      left: max(24px, env(safe-area-inset-left));
-      right: max(24px, env(safe-area-inset-right));
+      width: 100%;
       justify-content: space-between;
-      align-items: flex-end;
+      align-items: center;
       pointer-events: none;
       z-index: 20;
     }
@@ -149,9 +142,9 @@
       width: 78px;
       height: 78px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.14);
-      border: 2px solid rgba(255, 255, 255, 0.35);
-      color: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.16);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      color: rgba(255, 255, 255, 0.9);
       font-size: 28px;
       font-weight: bold;
       display: flex;
@@ -162,20 +155,51 @@
       text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
     }
     .ctrl-btn:active {
-      background: rgba(255, 255, 255, 0.35);
-      border-color: rgba(255, 255, 255, 0.75);
+      background: rgba(255, 255, 255, 0.4);
+      border-color: rgba(255, 255, 255, 0.8);
       transform: scale(0.94);
     }
 
-    /* Mobilde Oyun Kutusu Tam Ekran Yayılır */
-    @media (hover: none) and (pointer: coarse) {
-      #mobile-controls { display: flex; }
+    /* 1) MOBİL DİK MOD (PORTRAIT): Oyun üstte kompakt 16:9 açılır, tuşlar altında durur */
+    @media (hover: none) and (pointer: coarse) and (orientation: portrait) {
+      #game-stage {
+        justify-content: space-between;
+        padding-top: max(16px, env(safe-area-inset-top));
+        padding-bottom: max(28px, env(safe-area-inset-bottom));
+      }
+      #game-container {
+        width: 100vw;
+        max-width: 100vw;
+        aspect-ratio: 16 / 9;
+        margin-top: auto;
+        margin-bottom: auto;
+      }
+      #mobile-controls {
+        display: flex;
+        padding: 0 24px;
+        margin-bottom: 12px;
+      }
+      .ctrl-btn {
+        background: rgba(255, 255, 255, 0.12);
+      }
+    }
+
+    /* 2) MOBİL YATAY MOD (LANDSCAPE): Oyun tam ekrana büyür, tuşlar ekranın köşelerine geçer */
+    @media (hover: none) and (pointer: coarse) and (orientation: landscape) {
       #game-container {
         width: 100vw;
         height: 100dvh;
         max-width: 100vw;
         max-height: 100dvh;
         aspect-ratio: auto;
+      }
+      #mobile-controls {
+        display: flex;
+        position: fixed;
+        bottom: max(18px, env(safe-area-inset-bottom));
+        left: max(24px, env(safe-area-inset-left));
+        right: max(24px, env(safe-area-inset-right));
+        width: auto;
       }
     }
   </style>
@@ -213,7 +237,7 @@
   </div>
 
 <script>
-// Service Worker Kaydı (/2d_game/ kapsamı)
+// Service Worker Kaydı
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/2d_game/sw.js', { scope: '/2d_game/' })
@@ -251,7 +275,7 @@ const keys = { right: false, left: false };
 
 const player = {
   x: 60, y: 200, width: 32, height: 42,
-  vx: 0, vy: 0, speed: 3.8, jumpPower: -10.5,
+  vx: 0, vy: 0, speed: 4.0, jumpPower: -10.8,
   grounded: false,
   jumpCount: 0,
   maxJumps: 2
@@ -263,9 +287,7 @@ function getSavedProgress() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     return raw ? JSON.parse(raw) : null;
-  } catch (e) {
-    return null;
-  }
+  } catch (e) { return null; }
 }
 
 function saveProgress(lvl, sc, cn) {
@@ -275,9 +297,7 @@ function saveProgress(lvl, sc, cn) {
 }
 
 function clearProgress() {
-  try {
-    localStorage.removeItem(SAVE_KEY);
-  } catch (e) {}
+  try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
 }
 
 function refreshMenu() {
@@ -290,23 +310,10 @@ function refreshMenu() {
   }
 }
 
-// Oyuna Girince Tam Ekran ve Yatay Kilit (Yalnızca destekleyen cihazlarda)
-async function enterLandscapeGame(startLevel, startScore, startCoins) {
+function startGame(startLevel, startScore, startCoins) {
   isGameRunning = true;
   mainMenu.style.display = 'none';
   gameStage.style.display = 'flex';
-
-  try {
-    const docEl = document.documentElement;
-    if (docEl.requestFullscreen && !document.fullscreenElement) {
-      await docEl.requestFullscreen();
-    } else if (docEl.webkitRequestFullscreen && !document.webkitFullscreenElement) {
-      await docEl.webkitRequestFullscreen();
-    }
-    if (screen.orientation && screen.orientation.lock) {
-      await screen.orientation.lock('landscape-primary');
-    }
-  } catch (e) {}
 
   score = startScore;
   coinCount = startCoins;
@@ -321,37 +328,24 @@ function returnToMenu() {
   gameStage.style.display = 'none';
   mainMenu.style.display = 'flex';
   refreshMenu();
-
-  try {
-    if (screen.orientation && screen.orientation.unlock) {
-      screen.orientation.unlock();
-    }
-    if (document.fullscreenElement && document.exitFullscreen) {
-      document.exitFullscreen();
-    }
-  } catch (e) {}
 }
 
 btnNewGame.addEventListener('click', () => {
   clearProgress();
-  enterLandscapeGame(1, 0, 0);
+  startGame(1, 0, 0);
 });
 
 btnContinue.addEventListener('click', () => {
   const saved = getSavedProgress();
-  if (saved) {
-    enterLandscapeGame(saved.level, saved.score || 0, saved.coins || 0);
-  } else {
-    enterLandscapeGame(1, 0, 0);
-  }
+  if (saved) startGame(saved.level, saved.score || 0, saved.coins || 0);
+  else startGame(1, 0, 0);
 });
 
 btnInGameMenu.addEventListener('click', returnToMenu);
 
-// 5 Farklı Bölüm Tasarımı
+// 5 Farklı Bölüm
 const LEVELS = [
   {
-    name: "1 - Güneşli Çayır",
     sky: "#5c94fc", groundTop: "#00a800", groundBody: "#c84c0c",
     flagX: 2250,
     platforms: [
@@ -377,7 +371,6 @@ const LEVELS = [
     ]
   },
   {
-    name: "2 - Gün Batımı",
     sky: "#f97316", groundTop: "#65a30d", groundBody: "#78350f",
     flagX: 2500,
     platforms: [
@@ -405,7 +398,6 @@ const LEVELS = [
     ]
   },
   {
-    name: "3 - Karanlık Mağara",
     sky: "#1e1b4b", groundTop: "#4f46e5", groundBody: "#312e81",
     flagX: 2650,
     platforms: [
@@ -432,7 +424,6 @@ const LEVELS = [
     ]
   },
   {
-    name: "4 - Lav Kalesi",
     sky: "#450a0a", groundTop: "#dc2626", groundBody: "#1f2937",
     flagX: 2800,
     platforms: [
@@ -457,7 +448,6 @@ const LEVELS = [
     ]
   },
   {
-    name: "5 - Gökyüzü Zirvesi",
     sky: "#0284c7", groundTop: "#f8fafc", groundBody: "#64748b",
     flagX: 3000,
     platforms: [
@@ -532,15 +522,15 @@ function checkCollision(a, b) {
          a.y < b.y + b.h && a.y + a.height > b.y;
 }
 
-function update() {
+function update(dt) {
   if (!isGameRunning || gameOver || levelCleared || allCompleted) return;
 
   if (keys.right) player.vx = player.speed;
   else if (keys.left) player.vx = -player.speed;
-  else player.vx *= FRICTION;
+  else player.vx *= Math.pow(FRICTION, dt);
 
-  player.vy += GRAVITY;
-  player.x += player.vx;
+  player.vy += GRAVITY * dt;
+  player.x += player.vx * dt;
   if (player.x < 0) player.x = 0;
 
   platforms.forEach(p => {
@@ -550,7 +540,8 @@ function update() {
     }
   });
 
-  player.y += player.vy;
+  const prevBottom = player.y + player.height;
+  player.y += player.vy * dt;
   player.grounded = false;
 
   platforms.forEach(p => {
@@ -567,7 +558,7 @@ function update() {
     }
   });
 
-  jumpEffects.forEach(ef => { ef.r += 1.5; ef.alpha -= 0.06; });
+  jumpEffects.forEach(ef => { ef.r += 1.5 * dt; ef.alpha -= 0.06 * dt; });
   jumpEffects = jumpEffects.filter(ef => ef.alpha > 0);
 
   if (player.y > canvas.height) gameOver = true;
@@ -588,28 +579,28 @@ function update() {
     if (!e.alive) return;
 
     if (e.type === 'goomba' || e.type === 'spiky') {
-      e.x += e.vx;
+      e.x += e.vx * dt;
       if (e.x <= e.minX || e.x + e.w >= e.maxX) e.vx *= -1;
     } else if (e.type === 'jumper') {
-      e.x += e.vx;
+      e.x += e.vx * dt;
       if (e.x <= e.minX || e.x + e.w >= e.maxX) e.vx *= -1;
-      e.vy += 0.4;
-      e.y += e.vy;
+      e.vy += 0.4 * dt;
+      e.y += e.vy * dt;
       if (e.y >= 368) {
         e.y = 368;
         e.vy = -8.5;
       }
     } else if (e.type === 'flyer') {
-      e.x += e.vx;
+      e.x += e.vx * dt;
       if (e.x <= e.minX || e.x + e.w >= e.maxX) e.vx *= -1;
-      e.phase += 0.06;
+      e.phase += 0.06 * dt;
       e.y = e.baseY + Math.sin(e.phase) * 35;
     }
 
     if (checkCollision(player, e)) {
       if (e.type === 'spiky') {
         gameOver = true;
-      } else if (player.vy > 0 && player.y + player.height - player.vy <= e.y + 14) {
+      } else if (player.vy > 0 && prevBottom <= e.y + 16) {
         e.alive = false;
         player.vy = -8;
         player.jumpCount = 1;
@@ -775,34 +766,23 @@ function draw() {
   }
 }
 
-const FIXED_STEP = 1000 / 60;
 let lastTime = performance.now();
-let accumulator = 0;
 
 function loop(now) {
-  let frameTime = now - lastTime;
-  if (frameTime > 100) frameTime = 100;
+  let rawDt = (now - lastTime) / (1000 / 60);
   lastTime = now;
-  accumulator += frameTime;
+  if (rawDt > 2.5) rawDt = 2.5;
 
-  while (accumulator >= FIXED_STEP) {
-    update();
-    accumulator -= FIXED_STEP;
-  }
-
+  update(rawDt);
   draw();
   requestAnimationFrame(loop);
 }
 
 function handleScreenAction() {
   if (!isGameRunning) return;
-  if (allCompleted) {
-    returnToMenu();
-  } else if (levelCleared) {
-    loadLevel(currentLevel + 1);
-  } else if (gameOver) {
-    loadLevel(currentLevel);
-  }
+  if (allCompleted) returnToMenu();
+  else if (levelCleared) loadLevel(currentLevel + 1);
+  else if (gameOver) loadLevel(currentLevel);
 }
 
 window.addEventListener('keydown', e => {
