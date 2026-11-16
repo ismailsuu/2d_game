@@ -13,7 +13,7 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
     html, body {
-      width: 100%;
+      width: 100vw;
       height: 100dvh;
       background-color: #0f172a;
       display: flex;
@@ -74,11 +74,13 @@
       background: #ef4444;
     }
 
-    /* OYUN VE KONTROL SAHNESİ */
+    /* OYUN SAHNESİ (Ekrana Tam Oturan Düzen) */
     #game-stage {
       display: none;
       position: fixed;
       inset: 0;
+      width: 100vw;
+      height: 100dvh;
       background: #0f172a;
       align-items: center;
       justify-content: center;
@@ -129,7 +131,7 @@
     /* BÜYÜK VE ŞEFFAF MOBİL KONTROLLER */
     #mobile-controls {
       display: none;
-      position: absolute;
+      position: fixed;
       bottom: max(18px, env(safe-area-inset-bottom));
       left: max(24px, env(safe-area-inset-left));
       right: max(24px, env(safe-area-inset-right));
@@ -165,25 +167,15 @@
       transform: scale(0.94);
     }
 
+    /* Mobilde Oyun Kutusu Tam Ekran Yayılır */
     @media (hover: none) and (pointer: coarse) {
       #mobile-controls { display: flex; }
       #game-container {
-        max-width: 100%;
-        max-height: 100%;
-      }
-    }
-
-    /* CİHAZ DİKEY KALIRSA UYARI VERMEDEN SAHNEYİ OTOMATİK YATAY DÖNDÜR */
-    @media (hover: none) and (pointer: coarse) and (orientation: portrait) {
-      #game-stage {
-        width: 100dvh;
-        height: 100vw;
-        top: 50%;
-        left: 50%;
-        right: auto;
-        bottom: auto;
-        transform: translate(-50%, -50%) rotate(90deg);
-        transform-origin: center center;
+        width: 100vw;
+        height: 100dvh;
+        max-width: 100vw;
+        max-height: 100dvh;
+        aspect-ratio: auto;
       }
     }
   </style>
@@ -199,7 +191,7 @@
     </div>
   </div>
 
-  <!-- OYUN SAHNESİ (Otomatik Yatay Uyumlu) -->
+  <!-- OYUN SAHNESİ -->
   <div id="game-stage">
     <div id="game-container">
       <div id="hud">
@@ -298,7 +290,7 @@ function refreshMenu() {
   }
 }
 
-// Oyuna Girince Doğrudan Yatay Başlatma (Donanımsal + CSS Yedekli)
+// Oyuna Girince Tam Ekran ve Yatay Kilit (Yalnızca destekleyen cihazlarda)
 async function enterLandscapeGame(startLevel, startScore, startCoins) {
   isGameRunning = true;
   mainMenu.style.display = 'none';
@@ -314,9 +306,7 @@ async function enterLandscapeGame(startLevel, startScore, startCoins) {
     if (screen.orientation && screen.orientation.lock) {
       await screen.orientation.lock('landscape-primary');
     }
-  } catch (e) {
-    // Donanım kilidi desteklenmiyorsa CSS @media kuralı ekranı otomatik 90° yatay yapar
-  }
+  } catch (e) {}
 
   score = startScore;
   coinCount = startCoins;
