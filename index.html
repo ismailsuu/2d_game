@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#5c94fc">
+  <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Süper JS Mario</title>
@@ -22,7 +22,69 @@
       overflow: hidden;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+
+    /* ANA MENÜ EKRANI */
+    #main-menu {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 65%, #16a34a 65%, #15803d 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+      text-align: center;
+    }
+    .game-title {
+      font-size: clamp(32px, 6vw, 54px);
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 4px 4px 0 #1e293b, -1px -1px 0 #1e293b;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+    .game-subtitle {
+      font-size: 15px;
+      color: #f8fafc;
+      background: rgba(15, 23, 42, 0.45);
+      padding: 6px 16px;
+      border-radius: 20px;
+      margin-bottom: 28px;
+    }
+    .menu-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+      max-width: 290px;
+    }
+    .menu-btn {
+      padding: 15px 20px;
+      font-size: 18px;
+      font-weight: bold;
+      border: 3px solid #ffffff;
+      border-radius: 14px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 6px 0 rgba(15, 23, 42, 0.5);
+      transition: transform 0.1s;
+    }
+    .menu-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 rgba(15, 23, 42, 0.5);
+    }
+    #btn-continue {
+      background: #22c55e;
+      display: none;
+    }
+    #btn-new-game {
+      background: #ef4444;
+    }
+
+    /* OYUN ALANI */
     #game-container {
+      display: none;
       position: relative;
       width: 100%;
       height: 100%;
@@ -43,14 +105,27 @@
       right: 16px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
       color: white;
       font-size: 16px;
       font-weight: bold;
       text-shadow: 2px 2px 0 #000;
-      pointer-events: none;
       z-index: 5;
+      pointer-events: none;
     }
-    /* Daha Büyük ve Şeffaf Mobil Kontroller */
+    #btn-in-game-menu {
+      pointer-events: auto;
+      background: rgba(15, 23, 42, 0.5);
+      border: 1.5px solid rgba(255, 255, 255, 0.6);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* BÜYÜK VE ŞEFFAF MOBİL KONTROLLER */
     #mobile-controls {
       display: none;
       position: fixed;
@@ -88,7 +163,8 @@
       border-color: rgba(255, 255, 255, 0.75);
       transform: scale(0.94);
     }
-    /* Dikey Tutma Uyarısı (Sadece mobilde dikey pozisyonda çıkar) */
+
+    /* OYUN İÇİ DİKEY UYARI (Sadece oyun başladıktan sonra dik tutulursa) */
     #rotate-warning {
       display: none;
       position: fixed;
@@ -111,37 +187,50 @@
       0%, 100% { transform: rotate(0deg); }
       50% { transform: rotate(-90deg); }
     }
+
     @media (hover: none) and (pointer: coarse) {
-      #mobile-controls { display: flex; }
       #game-container {
         max-width: 100vw;
         max-height: 100dvh;
       }
     }
-    /* Telefon dikey tutulduğunda oyunu durdur ve sola yatır uyarısı göster */
     @media (hover: none) and (pointer: coarse) and (orientation: portrait) {
-      #rotate-warning { display: flex; }
-      #mobile-controls { display: none !important; }
+      body.playing #rotate-warning { display: flex; }
+      body.playing #mobile-controls { display: none !important; }
     }
   </style>
 </head>
 <body>
 
+  <!-- ANA MENÜ -->
+  <div id="main-menu">
+    <div class="game-title">SÜPER JS MARİO</div>
+    <div class="game-subtitle">5 Bölüm • Çift Zıplama • 4 Düşman Türü</div>
+    <div class="menu-buttons">
+      <button class="menu-btn" id="btn-continue">DEVAM ET</button>
+      <button class="menu-btn" id="btn-new-game">YENİ OYUN</button>
+    </div>
+  </div>
+
+  <!-- YATAY EKRAN UYARISI -->
   <div id="rotate-warning">
     <div class="phone-icon">📱</div>
     <h2>Lütfen Telefonu Sola Yatırın</h2>
-    <p style="color: #94a3b8; font-size: 15px;">Oyun sadece yatay (landscape) modda oynanabilir.</p>
+    <p style="color: #94a3b8; font-size: 15px;">Oyun yatay ekranda oynanmak üzere tasarlanmıştır.</p>
   </div>
 
+  <!-- OYUN EKRANI -->
   <div id="game-container">
     <div id="hud">
       <span>BÖLÜM: <span id="level">1 / 5</span></span>
       <span>SKOR: <span id="score">0</span></span>
       <span>ALTIN: <span id="coins">0</span></span>
+      <button id="btn-in-game-menu">☰ MENÜ</button>
     </div>
     <canvas id="gameCanvas" width="800" height="450"></canvas>
   </div>
 
+  <!-- DOKUNMATİK TUŞLAR -->
   <div id="mobile-controls">
     <div class="btn-group">
       <button class="ctrl-btn" id="btn-left">◀</button>
@@ -160,14 +249,13 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Ekranı Sola Yatay (Landscape-Primary) Kilitleme Denemesi
-function lockLandscape() {
-  if (screen.orientation && screen.orientation.lock) {
-    screen.orientation.lock('landscape-primary').catch(() => {});
-  }
-}
-window.addEventListener('load', lockLandscape);
-window.addEventListener('touchstart', lockLandscape, { once: true });
+const SAVE_KEY = 'js_mario_save_v1';
+const mainMenu = document.getElementById('main-menu');
+const gameContainer = document.getElementById('game-container');
+const mobileControls = document.getElementById('mobile-controls');
+const btnContinue = document.getElementById('btn-continue');
+const btnNewGame = document.getElementById('btn-new-game');
+const btnInGameMenu = document.getElementById('btn-in-game-menu');
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -186,6 +274,7 @@ let cameraX = 0;
 let gameOver = false;
 let levelCleared = false;
 let allCompleted = false;
+let isGameRunning = false;
 
 const keys = { right: false, left: false };
 
@@ -198,6 +287,107 @@ const player = {
 };
 
 let jumpEffects = [];
+
+// Kayıt Yönetimi (LocalStorage)
+function getSavedProgress() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveProgress(lvl, sc, cn) {
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify({ level: lvl, score: sc, coins: cn }));
+  } catch (e) {}
+}
+
+function clearProgress() {
+  try {
+    localStorage.removeItem(SAVE_KEY);
+  } catch (e) {}
+}
+
+function refreshMenu() {
+  const saved = getSavedProgress();
+  if (saved && saved.level > 1 && saved.level <= MAX_LEVELS) {
+    btnContinue.style.display = 'block';
+    btnContinue.textContent = `DEVAM ET (BÖLÜM ${saved.level})`;
+  } else {
+    btnContinue.style.display = 'none';
+  }
+}
+
+// Oyuna Girince Tam Ekran ve Sola Yatay (Landscape) Kilitleme
+async function enterLandscapeGame(startLevel, startScore, startCoins) {
+  isGameRunning = true;
+  document.body.classList.add('playing');
+  mainMenu.style.display = 'none';
+  gameContainer.style.display = 'block';
+
+  // Mobil cihazsa dokunmatik kontrolleri göster
+  if (window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
+    mobileControls.style.display = 'flex';
+  }
+
+  // Tam ekran ve ekranı sola yatırma isteği (Kullanıcı tıklamasıyla tetiklenir)
+  try {
+    const docEl = document.documentElement;
+    if (docEl.requestFullscreen && !document.fullscreenElement) {
+      await docEl.requestFullscreen();
+    } else if (docEl.webkitRequestFullscreen && !document.webkitFullscreenElement) {
+      await docEl.webkitRequestFullscreen();
+    }
+    if (screen.orientation && screen.orientation.lock) {
+      await screen.orientation.lock('landscape-primary');
+    }
+  } catch (e) {
+    // Bazı tarayıcılar fullscreen/lock izin vermezse CSS uyarısı devreye girer
+  }
+
+  score = startScore;
+  coinCount = startCoins;
+  allCompleted = false;
+  loadLevel(startLevel);
+}
+
+function returnToMenu() {
+  isGameRunning = false;
+  document.body.classList.remove('playing');
+  keys.left = false;
+  keys.right = false;
+  gameContainer.style.display = 'none';
+  mobileControls.style.display = 'none';
+  mainMenu.style.display = 'flex';
+  refreshMenu();
+
+  try {
+    if (screen.orientation && screen.orientation.unlock) {
+      screen.orientation.unlock();
+    }
+    if (document.fullscreenElement && document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  } catch (e) {}
+}
+
+btnNewGame.addEventListener('click', () => {
+  clearProgress();
+  enterLandscapeGame(1, 0, 0);
+});
+
+btnContinue.addEventListener('click', () => {
+  const saved = getSavedProgress();
+  if (saved) {
+    enterLandscapeGame(saved.level, saved.score || 0, saved.coins || 0);
+  } else {
+    enterLandscapeGame(1, 0, 0);
+  }
+});
+
+btnInGameMenu.addEventListener('click', returnToMenu);
 
 // 5 Farklı Bölüm Tasarımı
 const LEVELS = [
@@ -367,7 +557,7 @@ function updateHUD() {
 }
 
 function triggerJump() {
-  if (gameOver || levelCleared || allCompleted) return;
+  if (!isGameRunning || gameOver || levelCleared || allCompleted) return;
   if (player.grounded || player.jumpCount < player.maxJumps) {
     player.vy = player.jumpPower;
     player.grounded = false;
@@ -388,7 +578,7 @@ function isPortraitMobile() {
 }
 
 function update() {
-  if (gameOver || levelCleared || allCompleted || isPortraitMobile()) return;
+  if (!isGameRunning || gameOver || levelCleared || allCompleted || isPortraitMobile()) return;
 
   if (keys.right) player.vx = player.speed;
   else if (keys.left) player.vx = -player.speed;
@@ -481,8 +671,10 @@ function update() {
     updateHUD();
     if (currentLevel < MAX_LEVELS) {
       levelCleared = true;
+      saveProgress(currentLevel + 1, score, coinCount);
     } else {
       allCompleted = true;
+      clearProgress();
     }
   }
 
@@ -492,6 +684,8 @@ function update() {
 }
 
 function draw() {
+  if (!isGameRunning) return;
+
   ctx.fillStyle = currentTheme.sky;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -611,17 +805,17 @@ function draw() {
       ctx.font = 'bold 34px sans-serif';
       ctx.fillText('EFSANE! TÜM 5 BÖLÜMÜ BİTİRDİN!', canvas.width / 2, canvas.height / 2 - 20);
       ctx.font = '20px sans-serif';
-      ctx.fillText(`Toplam Skor: ${score} — Baştan oynamak için dokun`, canvas.width / 2, canvas.height / 2 + 25);
+      ctx.fillText(`Toplam Skor: ${score} — Ana menüye dönmek için dokun`, canvas.width / 2, canvas.height / 2 + 25);
     } else if (levelCleared) {
       ctx.font = 'bold 34px sans-serif';
       ctx.fillText(`BÖLÜM ${currentLevel} TAMAMLANDI!`, canvas.width / 2, canvas.height / 2 - 20);
       ctx.font = '20px sans-serif';
-      ctx.fillText(`Bölüm ${currentLevel + 1}'e geçmek için ekrana dokun veya Space'e bas`, canvas.width / 2, canvas.height / 2 + 25);
+      ctx.fillText(`Bölüm ${currentLevel + 1}'e geçmek için ekrana dokun`, canvas.width / 2, canvas.height / 2 + 25);
     } else {
       ctx.font = 'bold 36px sans-serif';
       ctx.fillText('OYUN BİTTİ!', canvas.width / 2, canvas.height / 2 - 20);
       ctx.font = '20px sans-serif';
-      ctx.fillText('Bölümü tekrar denemek için dokun veya R tuşuna bas', canvas.width / 2, canvas.height / 2 + 25);
+      ctx.fillText('Tekrar denemek için ekrana dokun', canvas.width / 2, canvas.height / 2 + 25);
     }
   }
 }
@@ -646,9 +840,9 @@ function loop(now) {
 }
 
 function handleScreenAction() {
+  if (!isGameRunning) return;
   if (allCompleted) {
-    score = 0; coinCount = 0; allCompleted = false;
-    loadLevel(1);
+    returnToMenu();
   } else if (levelCleared) {
     loadLevel(currentLevel + 1);
   } else if (gameOver) {
@@ -657,6 +851,7 @@ function handleScreenAction() {
 }
 
 window.addEventListener('keydown', e => {
+  if (!isGameRunning) return;
   if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
   if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
   if ((e.code === 'ArrowUp' || e.code === 'Space' || e.code === 'KeyW') && !e.repeat) {
@@ -689,7 +884,7 @@ jumpBtn.addEventListener('touchstart', e => {
 
 canvas.addEventListener('click', handleScreenAction);
 
-loadLevel(1);
+refreshMenu();
 requestAnimationFrame(loop);
 </script>
 </body>
