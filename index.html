@@ -74,9 +74,18 @@
       background: #ef4444;
     }
 
-    /* OYUN ALANI */
-    #game-container {
+    /* OYUN VE KONTROL SAHNESİ */
+    #game-stage {
       display: none;
+      position: fixed;
+      inset: 0;
+      background: #0f172a;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #game-container {
       position: relative;
       width: 100%;
       height: 100%;
@@ -120,7 +129,7 @@
     /* BÜYÜK VE ŞEFFAF MOBİL KONTROLLER */
     #mobile-controls {
       display: none;
-      position: fixed;
+      position: absolute;
       bottom: max(18px, env(safe-area-inset-bottom));
       left: max(24px, env(safe-area-inset-left));
       right: max(24px, env(safe-area-inset-right));
@@ -156,39 +165,26 @@
       transform: scale(0.94);
     }
 
-    /* OYUN İÇİ DİKEY UYARI */
-    #rotate-warning {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: #0f172a;
-      color: white;
-      z-index: 9999;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 24px;
-      gap: 16px;
-    }
-    .phone-icon {
-      font-size: 56px;
-      animation: rotateLeft 1.6s infinite ease-in-out;
-    }
-    @keyframes rotateLeft {
-      0%, 100% { transform: rotate(0deg); }
-      50% { transform: rotate(-90deg); }
-    }
-
     @media (hover: none) and (pointer: coarse) {
+      #mobile-controls { display: flex; }
       #game-container {
-        max-width: 100vw;
-        max-height: 100dvh;
+        max-width: 100%;
+        max-height: 100%;
       }
     }
+
+    /* CİHAZ DİKEY KALIRSA UYARI VERMEDEN SAHNEYİ OTOMATİK YATAY DÖNDÜR */
     @media (hover: none) and (pointer: coarse) and (orientation: portrait) {
-      body.playing #rotate-warning { display: flex; }
-      body.playing #mobile-controls { display: none !important; }
+      #game-stage {
+        width: 100dvh;
+        height: 100vw;
+        top: 50%;
+        left: 50%;
+        right: auto;
+        bottom: auto;
+        transform: translate(-50%, -50%) rotate(90deg);
+        transform-origin: center center;
+      }
     }
   </style>
 </head>
@@ -203,31 +199,25 @@
     </div>
   </div>
 
-  <!-- YATAY EKRAN UYARISI -->
-  <div id="rotate-warning">
-    <div class="phone-icon">📱</div>
-    <h2>Lütfen Telefonu Sola Yatırın</h2>
-    <p style="color: #94a3b8; font-size: 15px;">Oyun yatay ekranda oynanmak üzere tasarlanmıştır.</p>
-  </div>
-
-  <!-- OYUN EKRANI -->
-  <div id="game-container">
-    <div id="hud">
-      <span>BÖLÜM: <span id="level">1 / 5</span></span>
-      <span>SKOR: <span id="score">0</span></span>
-      <span>ALTIN: <span id="coins">0</span></span>
-      <button id="btn-in-game-menu">☰ MENÜ</button>
+  <!-- OYUN SAHNESİ (Otomatik Yatay Uyumlu) -->
+  <div id="game-stage">
+    <div id="game-container">
+      <div id="hud">
+        <span>BÖLÜM: <span id="level">1 / 5</span></span>
+        <span>SKOR: <span id="score">0</span></span>
+        <span>ALTIN: <span id="coins">0</span></span>
+        <button id="btn-in-game-menu">☰ MENÜ</button>
+      </div>
+      <canvas id="gameCanvas" width="800" height="450"></canvas>
     </div>
-    <canvas id="gameCanvas" width="800" height="450"></canvas>
-  </div>
 
-  <!-- DOKUNMATİK TUŞLAR -->
-  <div id="mobile-controls">
-    <div class="btn-group">
-      <button class="ctrl-btn" id="btn-left">◀</button>
-      <button class="ctrl-btn" id="btn-right">▶</button>
+    <div id="mobile-controls">
+      <div class="btn-group">
+        <button class="ctrl-btn" id="btn-left">◀</button>
+        <button class="ctrl-btn" id="btn-right">▶</button>
+      </div>
+      <button class="ctrl-btn" id="btn-jump">▲</button>
     </div>
-    <button class="ctrl-btn" id="btn-jump">▲</button>
   </div>
 
 <script>
@@ -242,8 +232,7 @@ if ('serviceWorker' in navigator) {
 
 const SAVE_KEY = 'js_mario_save_v1';
 const mainMenu = document.getElementById('main-menu');
-const gameContainer = document.getElementById('game-container');
-const mobileControls = document.getElementById('mobile-controls');
+const gameStage = document.getElementById('game-stage');
 const btnContinue = document.getElementById('btn-continue');
 const btnNewGame = document.getElementById('btn-new-game');
 const btnInGameMenu = document.getElementById('btn-in-game-menu');
@@ -254,7 +243,6 @@ const levelEl = document.getElementById('level');
 const scoreEl = document.getElementById('score');
 const coinsEl = document.getElementById('coins');
 
-// Fizik Sabitleri
 const GRAVITY = 0.45;
 const FRICTION = 0.80;
 let currentLevel = 1;
@@ -279,7 +267,6 @@ const player = {
 
 let jumpEffects = [];
 
-// Kayıt Yönetimi (LocalStorage)
 function getSavedProgress() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
@@ -311,16 +298,11 @@ function refreshMenu() {
   }
 }
 
-// Oyuna Girince Tam Ekran ve Sola Yatay (Landscape) Kilitleme
+// Oyuna Girince Doğrudan Yatay Başlatma (Donanımsal + CSS Yedekli)
 async function enterLandscapeGame(startLevel, startScore, startCoins) {
   isGameRunning = true;
-  document.body.classList.add('playing');
   mainMenu.style.display = 'none';
-  gameContainer.style.display = 'block';
-
-  if (window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
-    mobileControls.style.display = 'flex';
-  }
+  gameStage.style.display = 'flex';
 
   try {
     const docEl = document.documentElement;
@@ -332,7 +314,9 @@ async function enterLandscapeGame(startLevel, startScore, startCoins) {
     if (screen.orientation && screen.orientation.lock) {
       await screen.orientation.lock('landscape-primary');
     }
-  } catch (e) {}
+  } catch (e) {
+    // Donanım kilidi desteklenmiyorsa CSS @media kuralı ekranı otomatik 90° yatay yapar
+  }
 
   score = startScore;
   coinCount = startCoins;
@@ -342,11 +326,9 @@ async function enterLandscapeGame(startLevel, startScore, startCoins) {
 
 function returnToMenu() {
   isGameRunning = false;
-  document.body.classList.remove('playing');
   keys.left = false;
   keys.right = false;
-  gameContainer.style.display = 'none';
-  mobileControls.style.display = 'none';
+  gameStage.style.display = 'none';
   mainMenu.style.display = 'flex';
   refreshMenu();
 
@@ -560,12 +542,8 @@ function checkCollision(a, b) {
          a.y < b.y + b.h && a.y + a.height > b.y;
 }
 
-function isPortraitMobile() {
-  return window.matchMedia("(hover: none) and (pointer: coarse) and (orientation: portrait)").matches;
-}
-
 function update() {
-  if (!isGameRunning || gameOver || levelCleared || allCompleted || isPortraitMobile()) return;
+  if (!isGameRunning || gameOver || levelCleared || allCompleted) return;
 
   if (keys.right) player.vx = player.speed;
   else if (keys.left) player.vx = -player.speed;
