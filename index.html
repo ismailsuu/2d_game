@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#5c94fc">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Süper JS Mario</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    body {
+      background-color: #1e293b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    #game-container {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      aspect-ratio: 16 / 9;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      background: #5c94fc;
+      display: block;
+      border-radius: 8px;
+    }
+    #hud {
+      position: absolute;
+      top: 12px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      text-shadow: 2px 2px 0 #000;
+      pointer-events: none;
+    }
+    /* Mobil Kontroller */
+    #mobile-controls {
+      display: none;
+      width: 100%;
+      max-width: 800px;
+      justify-content: space-between;
+      padding: 15px 25px;
+    }
+    .btn-group { display: flex; gap: 15px; }
+    .ctrl-btn {
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
+    }
+    .ctrl-btn:active { background: rgba(255, 255, 255, 0.5); }
+    @media (max-width: 850px), (pointer: coarse) {
+      #mobile-controls { display: flex; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="game-container">
+    <div id="hud">
+      <span>SKOR: <span id="score">0</span></span>
+      <span>ALTIN: <span id="coins">0</span></span>
+    </div>
+    <canvas id="gameCanvas" width="800" height="450"></canvas>
+  </div>
+
+  <div id="mobile-controls">
+    <div class="btn-group">
+      <button class="ctrl-btn" id="btn-left">◀</button>
+      <button class="ctrl-btn" id="btn-right">▶</button>
+    </div>
+    <button class="ctrl-btn" id="btn-jump">▲</button>
+  </div>
+
+<script>
+// Service Worker Kaydı (PWA)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW hatası:', err));
+  });
+}
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const scoreEl = document.getElementById('score');
+const coinsEl = document.getElementById('coins');
+
+// Oyun Sabitleri
+const GRAVITY = 0.6;
+const FRICTION = 0.8;
+let score = 0;
+let coinCount = 0;
+let cameraX = 0;
+let gameOver = false;
+let gameWon = false;
+
+// Tuş Durumları
+const keys = { right: false, left: false, up: false };
+
+// Oyuncu Nesnesi
+const player = {
+  x: 60, y: 200, width: 32, height: 42,
+  vx: 0, vy: 0, speed: 5, jumpPower: -13,
+  grounded: false
+};
+
+// Harita Elemanları (Platformlar, Borular, Altınlar, Düşmanlar, Bayrak)
+let platforms = [];
+let coins = [];
+let enemies = [];
+let flag = { x: 2300, y: 150, width: 15, height: 250 };
+
+function initLevel() {
+  player.x = 60; player.y = 200; player.vx = 0; player.vy = 0;
+  cameraX = 0; score = 0; coinCount = 0; gameOver = false; gameWon = false;
+  updateHUD();
+
+  // Zemin ve Bloklar (x, y, genişlik, yükseklik, tip)
+  platforms = [
+    { x: 0, y: 400, w: 700, h: 50, type: 'ground' },
+    { x: 800, y: 400, w: 650, h: 50, type: 'ground' },
+    { x: 1550, y: 400, w: 950, h: 50, type: 'ground' },
+    // Havadaki Tuğlalar
+    { x: 250, y: 280, w: 120, h: 25, type: 'brick' },
+    { x: 520, y: 220, w: 90, h: 25, type: 'brick' },
+    { x: 950, y: 270, w: 140, h: 25, type: 'brick' },
+    { x: 1220, y: 200, w: 100, h: 25, type: 'brick' },
+    { x: 1750, y: 280, w: 150, h: 25, type: 'brick' },
+    // Yeşil Borular
+    { x: 430, y: 340, w: 45, h: 60, type: 'pipe' },
+    { x: 1120, y: 320, w: 45, h: 80, type: 'pipe' },
+    { x: 1980, y: 330, w: 45, h: 70, type: 'pipe' }
+  ];
+
+  // Altınlar
+  coins = [
+    { x: 270, y: 240, r: 10, collected: false },
+    { x: 310, y: 240, r: 10, collected: false },
+    { x: 350, y: 240, r: 10, collected: false },
+    { x: 565, y: 180, r: 10, collected: false },
+    { x: 980, y: 230, r: 10, collected: false },
+    { x: 1020, y: 230, r: 10, collected: false },
+    { x: 1270, y: 160, r: 10, collected: false },
+    { x: 1800, y: 240, r: 10, collected: false },
+    { x: 1840, y: 240, r: 10, collected: false }
+  ];
+
+  // Düşmanlar (Goomba benzeri)
+  enemies = [
+    { x: 500, y: 368, w: 32, h: 32, vx: -1.5, minX: 480, maxX: 680, alive: true },
+    { x: 1000, y: 368, w: 32, h: 32, vx: -2, minX: 820, maxX: 1100, alive: true },
+    { x: 1700, y: 368, w: 32, h: 32, vx: -2, minX: 1600, maxX: 1950, alive: true }
+  ];
+}
+
+function updateHUD() {
+  scoreEl.textContent = score;
+  coinsEl.textContent = coinCount;
+}
+
+// Çarpışma Kontrolü (AABB)
+function checkCollision(a, b) {
+  return a.x < b.x + b.w && a.x + a.width > b.x &&
+         a.y < b.y + b.h && a.y + a.height > b.y;
+}
+
+function update() {
+  if (gameOver || gameWon) return;
+
+  // Yatay Hareket
+  if (keys.right) player.vx = player.speed;
+  else if (keys.left) player.vx = -player.speed;
+  else player.vx *= FRICTION;
+
+  // Zıplama
+  if (keys.up && player.grounded) {
+    player.vy = player.jumpPower;
+    player.grounded = false;
+  }
+
+  // Yerçekimi
+  player.vy += GRAVITY;
+  player.x += player.vx;
+  if (player.x < 0) player.x = 0;
+
+  // Yatay Platform Çarpışması
+  platforms.forEach(p => {
+    if (checkCollision(player, p)) {
+      if (player.vx > 0) player.x = p.x - player.width;
+      else if (player.vx < 0) player.x = p.x + p.w;
+    }
+  });
+
+  player.y += player.vy;
+  player.grounded = false;
+
+  // Dikey Platform Çarpışması
+  platforms.forEach(p => {
+    if (checkCollision(player, p)) {
+      if (player.vy > 0) {
+        player.y = p.y - player.height;
+        player.vy = 0;
+        player.grounded = true;
+      } else if (player.vy < 0) {
+        player.y = p.y + p.h;
+        player.vy = 0;
+      }
+    }
+  });
+
+  // Uçurumdan Düşme
+  if (player.y > canvas.height) gameOver = true;
+
+  // Altın Toplama
+  coins.forEach(c => {
+    if (!c.collected) {
+      let box = { x: c.x - c.r, y: c.y - c.r, w: c.r * 2, h: c.r * 2 };
+      if (checkCollision(player, box)) {
+        c.collected = true;
+        coinCount++;
+        score += 100;
+        updateHUD();
+      }
+    }
+  });
+
+  // Düşman Hareketi ve Çarpışma
+  enemies.forEach(e => {
+    if (!e.alive) return;
+    e.x += e.vx;
+    if (e.x <= e.minX || e.x + e.w >= e.maxX) e.vx *= -1;
+
+    if (checkCollision(player, e)) {
+      // Oyuncu düşmanın kafasına zıpladıysa
+      if (player.vy > 0 && player.y + player.height - player.vy <= e.y + 10) {
+        e.alive = false;
+        player.vy = -8; // Sekme efekti
+        score += 200;
+        updateHUD();
+      } else {
+        gameOver = true;
+      }
+    }
+  });
+
+  // Bitiş Bayrağı
+  if (checkCollision(player, { x: flag.x, y: flag.y, w: flag.width, h: flag.height })) {
+    gameWon = true;
+    score += 1000;
+    updateHUD();
+  }
+
+  // Kamera Takibi
+  if (player.x > canvas.width * 0.4) {
+    cameraX = player.x - canvas.width * 0.4;
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.translate(-cameraX, 0);
+
+  // Bulutlar (Arka plan dekoru)
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+  [150, 550, 1050, 1600, 2100].forEach(cx => {
+    ctx.beginPath();
+    ctx.arc(cx, 80, 25, 0, Math.PI * 2);
+    ctx.arc(cx + 25, 75, 30, 0, Math.PI * 2);
+    ctx.arc(cx + 50, 80, 25, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Platformlar
+  platforms.forEach(p => {
+    if (p.type === 'ground') {
+      ctx.fillStyle = '#c84c0c';
+      ctx.fillRect(p.x, p.y, p.w, p.h);
+      ctx.fillStyle = '#00a800'; // Çimen üst katman
+      ctx.fillRect(p.x, p.y, p.w, 10);
+    } else if (p.type === 'brick') {
+      ctx.fillStyle = '#b84818';
+      ctx.fillRect(p.x, p.y, p.w, p.h);
+      ctx.strokeStyle = '#000';
+      ctx.strokeRect(p.x, p.y, p.w, p.h);
+    } else if (p.type === 'pipe') {
+      ctx.fillStyle = '#00a800';
+      ctx.fillRect(p.x, p.y, p.w, p.h);
+      ctx.strokeStyle = '#004400';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(p.x, p.y, p.w, p.h);
+    }
+  });
+
+  // Altınlar
+  coins.forEach(c => {
+    if (!c.collected) {
+      ctx.fillStyle = '#ffd700';
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#b8860b';
+      ctx.stroke();
+    }
+  });
+
+  // Düşmanlar
+  enemies.forEach(e => {
+    if (e.alive) {
+      ctx.fillStyle = '#8b4513';
+      ctx.fillRect(e.x, e.y, e.w, e.h);
+      // Gözler
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(e.x + 6, e.y + 8, 6, 6);
+      ctx.fillRect(e.x + 20, e.y + 8, 6, 6);
+    }
+  });
+
+  // Bitiş Bayrağı
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(flag.x, flag.y, 6, flag.height);
+  ctx.fillStyle = '#e52521';
+  ctx.beginPath();
+  ctx.moveTo(flag.x + 6, flag.y);
+  ctx.lineTo(flag.x + 65, flag.y + 25);
+  ctx.lineTo(flag.x + 6, flag.y + 50);
+  ctx.fill();
+
+  // Oyuncu (Mario Temsili Çizim)
+  ctx.fillStyle = '#e52521'; // Şapka ve Tişört
+  ctx.fillRect(player.x, player.y, player.width, player.height);
+  ctx.fillStyle = '#0058f8'; // Tulum
+  ctx.fillRect(player.x + 4, player.y + 20, player.width - 8, 22);
+  ctx.fillStyle = '#ffcc99'; // Yüz
+  ctx.fillRect(player.x + 8, player.y + 6, 18, 12);
+
+  ctx.restore();
+
+  // Oyun Sonu / Kazanma Ekranı
+  if (gameOver || gameWon) {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 36px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(gameWon ? 'TEBRİKLER, BÖLÜMÜ GEÇTİN!' : 'OYUN BİTTİ!', canvas.width / 2, canvas.height / 2 - 20);
+    ctx.font = '20px sans-serif';
+    ctx.fillText('Tekrar oynamak için ekrana dokun veya R tuşuna bas', canvas.width / 2, canvas.height / 2 + 25);
+  }
+}
+
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+// Klavye Kontrolleri
+window.addEventListener('keydown', e => {
+  if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
+  if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
+  if (e.code === 'ArrowUp' || e.code === 'Space' || e.code === 'KeyW') keys.up = true;
+  if (e.code === 'KeyR' && (gameOver || gameWon)) initLevel();
+});
+
+window.addEventListener('keyup', e => {
+  if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
+  if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
+  if (e.code === 'ArrowUp' || e.code === 'Space' || e.code === 'KeyW') keys.up = false;
+});
+
+// Dokunmatik Kontroller
+const bindTouch = (id, key) => {
+  const btn = document.getElementById(id);
+  btn.addEventListener('touchstart', e => { e.preventDefault(); keys[key] = true; });
+  btn.addEventListener('touchend', e => { e.preventDefault(); keys[key] = false; });
+};
+bindTouch('btn-left', 'left');
+bindTouch('btn-right', 'right');
+bindTouch('btn-jump', 'up');
+
+canvas.addEventListener('click', () => {
+  if (gameOver || gameWon) initLevel();
+});
+
+initLevel();
+loop();
+</script>
+</body>
+</html>
