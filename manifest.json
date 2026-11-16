@@ -1,11 +1,11 @@
 {
   "name": "2D Platform",
   "short_name": "2D Platform",
-  "description": "2D Platform Oyunu",
+  "description": "2D Platform",
   "start_url": "/2d_game/index.html",
   "scope": "/2d_game/",
   "display": "standalone",
-  "orientation": "any",
+  "orientation": "landscape",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
   "icons": [
