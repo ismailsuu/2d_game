@@ -7,9 +7,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Süper JS Mario</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/png" href="icon.png">
-  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="manifest" href="/2d_game/manifest.json">
+  <link rel="icon" type="image/png" href="/2d_game/icon.png">
+  <link rel="apple-touch-icon" href="/2d_game/icon.png">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
     html, body {
@@ -51,7 +51,7 @@
       pointer-events: none;
       z-index: 5;
     }
-    /* Mobil Kontroller: Ekranın üzerine sabitlenmiş katman */
+    /* Mobil Kontroller: Ekran içi köşe sabitlemesi */
     #mobile-controls {
       display: none;
       position: fixed;
@@ -88,7 +88,6 @@
       background: rgba(255, 255, 255, 0.55);
       transform: scale(0.95);
     }
-    /* Yatay mobilde tam ekran oturumu */
     @media (hover: none) and (pointer: coarse) {
       #mobile-controls { display: flex; }
       #game-container {
@@ -117,10 +116,12 @@
   </div>
 
 <script>
-// Service Worker Kaydı (PWA)
+// Service Worker Kaydı (/2d_game/ kapsamı)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW hatası:', err));
+    navigator.serviceWorker.register('/2d_game/sw.js', { scope: '/2d_game/' })
+      .then(reg => reg.update())
+      .catch(err => console.log('SW hatası:', err));
   });
 }
 
@@ -129,26 +130,23 @@ const ctx = canvas.getContext('2d');
 const scoreEl = document.getElementById('score');
 const coinsEl = document.getElementById('coins');
 
-// Dengeli Oyun Sabitleri
-const GRAVITY = 0.5;
-const FRICTION = 0.82;
+// Dengeli Fizik Sabitleri (60 Hz referanslı)
+const GRAVITY = 0.45;
+const FRICTION = 0.80;
 let score = 0;
 let coinCount = 0;
 let cameraX = 0;
 let gameOver = false;
 let gameWon = false;
 
-// Tuş Durumları
 const keys = { right: false, left: false, up: false };
 
-// Oyuncu Nesnesi
 const player = {
   x: 60, y: 200, width: 32, height: 42,
-  vx: 0, vy: 0, speed: 4, jumpPower: -11.5,
+  vx: 0, vy: 0, speed: 3.8, jumpPower: -11,
   grounded: false
 };
 
-// Harita Elemanları
 let platforms = [];
 let coins = [];
 let enemies = [];
@@ -186,9 +184,9 @@ function initLevel() {
   ];
 
   enemies = [
-    { x: 500, y: 368, w: 32, h: 32, vx: -1.2, minX: 480, maxX: 680, alive: true },
-    { x: 1000, y: 368, w: 32, h: 32, vx: -1.5, minX: 820, maxX: 1100, alive: true },
-    { x: 1700, y: 368, w: 32, h: 32, vx: -1.5, minX: 1600, maxX: 1950, alive: true }
+    { x: 500, y: 368, w: 32, h: 32, vx: -1.1, minX: 480, maxX: 680, alive: true },
+    { x: 1000, y: 368, w: 32, h: 32, vx: -1.3, minX: 820, maxX: 1100, alive: true },
+    { x: 1700, y: 368, w: 32, h: 32, vx: -1.3, minX: 1600, maxX: 1950, alive: true }
   ];
 }
 
@@ -368,19 +366,24 @@ function draw() {
   }
 }
 
-let lastTime = 0;
-const FPS = 60;
-const frameInterval = 1000 / FPS;
+// 144Hz / 240Hz Bağımsız Sabit Zaman Adımlı (Fixed Timestep) Motor
+const FIXED_STEP = 1000 / 60;
+let lastTime = performance.now();
+let accumulator = 0;
 
-function loop(timestamp) {
-  requestAnimationFrame(loop);
+function loop(now) {
+  let frameTime = now - lastTime;
+  if (frameTime > 100) frameTime = 100;
+  lastTime = now;
+  accumulator += frameTime;
 
-  const deltaTime = timestamp - lastTime;
-  if (deltaTime >= frameInterval) {
-    lastTime = timestamp - (deltaTime % frameInterval);
+  while (accumulator >= FIXED_STEP) {
     update();
-    draw();
+    accumulator -= FIXED_STEP;
   }
+
+  draw();
+  requestAnimationFrame(loop);
 }
 
 window.addEventListener('keydown', e => {
