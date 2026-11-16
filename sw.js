@@ -1,9 +1,9 @@
-const CACHE_NAME = 'js-mario-pwa-v2';
+const CACHE_NAME = 'js-mario-2d-game-v6';
 const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icon.png'
+  '/2d_game/',
+  '/2d_game/index.html',
+  '/2d_game/manifest.json',
+  '/2d_game/icon.png'
 ];
 
 self.addEventListener('install', event => {
@@ -19,14 +19,18 @@ self.addEventListener('activate', event => {
       return Promise.all(
         keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
-    })
+    fetch(event.request)
+      .then(response => {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
