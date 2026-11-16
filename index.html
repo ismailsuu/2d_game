@@ -50,12 +50,13 @@
       pointer-events: none;
       z-index: 5;
     }
+    /* Daha Büyük ve Şeffaf Mobil Kontroller */
     #mobile-controls {
       display: none;
       position: fixed;
-      bottom: max(16px, env(safe-area-inset-bottom));
-      left: max(20px, env(safe-area-inset-left));
-      right: max(20px, env(safe-area-inset-right));
+      bottom: max(18px, env(safe-area-inset-bottom));
+      left: max(24px, env(safe-area-inset-left));
+      right: max(24px, env(safe-area-inset-right));
       justify-content: space-between;
       align-items: flex-end;
       pointer-events: none;
@@ -63,28 +64,52 @@
     }
     .btn-group {
       display: flex;
-      gap: 16px;
+      gap: 22px;
       pointer-events: auto;
     }
     .ctrl-btn {
-      width: 62px;
-      height: 62px;
+      width: 78px;
+      height: 78px;
       border-radius: 50%;
-      background: rgba(15, 23, 42, 0.45);
-      border: 2px solid rgba(255, 255, 255, 0.75);
-      color: white;
-      font-size: 22px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 28px;
       font-weight: bold;
       display: flex;
       align-items: center;
       justify-content: center;
       touch-action: manipulation;
       pointer-events: auto;
-      backdrop-filter: blur(2px);
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
     }
     .ctrl-btn:active {
-      background: rgba(255, 255, 255, 0.55);
-      transform: scale(0.95);
+      background: rgba(255, 255, 255, 0.35);
+      border-color: rgba(255, 255, 255, 0.75);
+      transform: scale(0.94);
+    }
+    /* Dikey Tutma Uyarısı (Sadece mobilde dikey pozisyonda çıkar) */
+    #rotate-warning {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #0f172a;
+      color: white;
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      gap: 16px;
+    }
+    .phone-icon {
+      font-size: 56px;
+      animation: rotateLeft 1.6s infinite ease-in-out;
+    }
+    @keyframes rotateLeft {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(-90deg); }
     }
     @media (hover: none) and (pointer: coarse) {
       #mobile-controls { display: flex; }
@@ -93,9 +118,20 @@
         max-height: 100dvh;
       }
     }
+    /* Telefon dikey tutulduğunda oyunu durdur ve sola yatır uyarısı göster */
+    @media (hover: none) and (pointer: coarse) and (orientation: portrait) {
+      #rotate-warning { display: flex; }
+      #mobile-controls { display: none !important; }
+    }
   </style>
 </head>
 <body>
+
+  <div id="rotate-warning">
+    <div class="phone-icon">📱</div>
+    <h2>Lütfen Telefonu Sola Yatırın</h2>
+    <p style="color: #94a3b8; font-size: 15px;">Oyun sadece yatay (landscape) modda oynanabilir.</p>
+  </div>
 
   <div id="game-container">
     <div id="hud">
@@ -124,6 +160,15 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+// Ekranı Sola Yatay (Landscape-Primary) Kilitleme Denemesi
+function lockLandscape() {
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape-primary').catch(() => {});
+  }
+}
+window.addEventListener('load', lockLandscape);
+window.addEventListener('touchstart', lockLandscape, { once: true });
+
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const levelEl = document.getElementById('level');
@@ -144,7 +189,6 @@ let allCompleted = false;
 
 const keys = { right: false, left: false };
 
-// Oyuncu Nesnesi (Çift Zıplama Destekli)
 const player = {
   x: 60, y: 200, width: 32, height: 42,
   vx: 0, vy: 0, speed: 3.8, jumpPower: -10.5,
@@ -153,12 +197,10 @@ const player = {
   maxJumps: 2
 };
 
-// Çift Zıplama Efekt Halkaları
 let jumpEffects = [];
 
 // 5 Farklı Bölüm Tasarımı
 const LEVELS = [
-  // BÖLÜM 1: Güneşli Çayır
   {
     name: "1 - Güneşli Çayır",
     sky: "#5c94fc", groundTop: "#00a800", groundBody: "#c84c0c",
@@ -185,8 +227,6 @@ const LEVELS = [
       { type: 'jumper', x: 1700, y: 368, w: 32, h: 32, vx: -1.0, vy: 0, minX: 1600, maxX: 2000 }
     ]
   },
-
-  // BÖLÜM 2: Gün Batımı Tepeleri (Uçan Düşmanlar Tanıtımı)
   {
     name: "2 - Gün Batımı",
     sky: "#f97316", groundTop: "#65a30d", groundBody: "#78350f",
@@ -215,8 +255,6 @@ const LEVELS = [
       { type: 'jumper', x: 1650, y: 368, w: 32, h: 32, vx: -1.2, vy: 0, minX: 1420, maxX: 1900 }
     ]
   },
-
-  // BÖLÜM 3: Karanlık Mağara (Dikenli Düşmanlar!)
   {
     name: "3 - Karanlık Mağara",
     sky: "#1e1b4b", groundTop: "#4f46e5", groundBody: "#312e81",
@@ -244,8 +282,6 @@ const LEVELS = [
       { type: 'spiky', x: 2050, y: 370, w: 34, h: 30, vx: -1.6, minX: 1750, maxX: 2400 }
     ]
   },
-
-  // BÖLÜM 4: Lav Kalesi (Geniş Uçurumlar ve Çift Zıplama Parkuru)
   {
     name: "4 - Lav Kalesi",
     sky: "#450a0a", groundTop: "#dc2626", groundBody: "#1f2937",
@@ -271,8 +307,6 @@ const LEVELS = [
       { type: 'jumper', x: 2550, y: 368, w: 32, h: 32, vx: -1.5, vy: 0, minX: 2350, maxX: 2720 }
     ]
   },
-
-  // BÖLÜM 5: Gökyüzü Zirvesi (Final)
   {
     name: "5 - Gökyüzü Zirvesi",
     sky: "#0284c7", groundTop: "#f8fafc", groundBody: "#64748b",
@@ -332,14 +366,12 @@ function updateHUD() {
   coinsEl.textContent = coinCount;
 }
 
-// Tek ve Çift Zıplama Tetikleyicisi
 function triggerJump() {
   if (gameOver || levelCleared || allCompleted) return;
   if (player.grounded || player.jumpCount < player.maxJumps) {
     player.vy = player.jumpPower;
     player.grounded = false;
     player.jumpCount++;
-    // İkinci zıplamada görsel halka efekti
     if (player.jumpCount === 2) {
       jumpEffects.push({ x: player.x + player.width / 2, y: player.y + player.height, r: 6, alpha: 1 });
     }
@@ -351,8 +383,12 @@ function checkCollision(a, b) {
          a.y < b.y + b.h && a.y + a.height > b.y;
 }
 
+function isPortraitMobile() {
+  return window.matchMedia("(hover: none) and (pointer: coarse) and (orientation: portrait)").matches;
+}
+
 function update() {
-  if (gameOver || levelCleared || allCompleted) return;
+  if (gameOver || levelCleared || allCompleted || isPortraitMobile()) return;
 
   if (keys.right) player.vx = player.speed;
   else if (keys.left) player.vx = -player.speed;
@@ -378,7 +414,7 @@ function update() {
         player.y = p.y - player.height;
         player.vy = 0;
         player.grounded = true;
-        player.jumpCount = 0; // Yere basınca çift zıplama hakkı yenilenir
+        player.jumpCount = 0;
       } else if (player.vy < 0) {
         player.y = p.y + p.h;
         player.vy = 0;
@@ -386,13 +422,11 @@ function update() {
     }
   });
 
-  // Çift zıplama efekt animasyonu
   jumpEffects.forEach(ef => { ef.r += 1.5; ef.alpha -= 0.06; });
   jumpEffects = jumpEffects.filter(ef => ef.alpha > 0);
 
   if (player.y > canvas.height) gameOver = true;
 
-  // Altın Toplama
   coins.forEach(c => {
     if (!c.collected) {
       let box = { x: c.x - c.r, y: c.y - c.r, w: c.r * 2, h: c.r * 2 };
@@ -405,7 +439,6 @@ function update() {
     }
   });
 
-  // Farklı Düşman Türlerinin Yapay Zekası
   enemies.forEach(e => {
     if (!e.alive) return;
 
@@ -419,23 +452,22 @@ function update() {
       e.y += e.vy;
       if (e.y >= 368) {
         e.y = 368;
-        e.vy = -8.5; // Periyodik zıplama
+        e.vy = -8.5;
       }
     } else if (e.type === 'flyer') {
       e.x += e.vx;
       if (e.x <= e.minX || e.x + e.w >= e.maxX) e.vx *= -1;
       e.phase += 0.06;
-      e.y = e.baseY + Math.sin(e.phase) * 35; // Havada dalgalı uçuş
+      e.y = e.baseY + Math.sin(e.phase) * 35;
     }
 
     if (checkCollision(player, e)) {
-      // Dikenli düşmanların üstüne zıplanamaz!
       if (e.type === 'spiky') {
         gameOver = true;
       } else if (player.vy > 0 && player.y + player.height - player.vy <= e.y + 14) {
         e.alive = false;
         player.vy = -8;
-        player.jumpCount = 1; // Düşman üstünden sekince havada 1 zıplama daha verir
+        player.jumpCount = 1;
         score += 250;
         updateHUD();
       } else {
@@ -444,7 +476,6 @@ function update() {
     }
   });
 
-  // Bitiş Bayrağı Kontrolü
   if (checkCollision(player, { x: flag.x, y: flag.y, w: flag.width, h: flag.height })) {
     score += 1000;
     updateHUD();
@@ -461,14 +492,12 @@ function update() {
 }
 
 function draw() {
-  // Arka Plan Gökyüzü (Bölüme göre değişir)
   ctx.fillStyle = currentTheme.sky;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.save();
   ctx.translate(-cameraX, 0);
 
-  // Bulutlar / Arka Plan Süsleri
   ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
   [150, 600, 1100, 1650, 2200, 2750].forEach(cx => {
     ctx.beginPath();
@@ -478,7 +507,6 @@ function draw() {
     ctx.fill();
   });
 
-  // Platformlar
   platforms.forEach(p => {
     if (p.type === 'ground') {
       ctx.fillStyle = currentTheme.groundBody;
@@ -499,7 +527,6 @@ function draw() {
     }
   });
 
-  // Altınlar
   coins.forEach(c => {
     if (!c.collected) {
       ctx.fillStyle = '#ffd700';
@@ -511,7 +538,6 @@ function draw() {
     }
   });
 
-  // Düşman Çizimleri (4 Farklı Görünüm)
   enemies.forEach(e => {
     if (!e.alive) return;
     if (e.type === 'goomba') {
@@ -529,7 +555,6 @@ function draw() {
     } else if (e.type === 'flyer') {
       ctx.fillStyle = '#9333ea';
       ctx.fillRect(e.x, e.y, e.w, e.h);
-      // Kanatlar
       ctx.fillStyle = '#e9d5ff';
       ctx.fillRect(e.x - 6, e.y + 4, 8, 10);
       ctx.fillRect(e.x + e.w - 2, e.y + 4, 8, 10);
@@ -539,7 +564,6 @@ function draw() {
     } else if (e.type === 'spiky') {
       ctx.fillStyle = '#dc2626';
       ctx.fillRect(e.x, e.y + 6, e.w, e.h - 6);
-      // Üst Dikenler
       ctx.fillStyle = '#ffffff';
       for (let i = 0; i < 3; i++) {
         ctx.beginPath();
@@ -551,7 +575,6 @@ function draw() {
     }
   });
 
-  // Çift Zıplama Halka Efekti
   jumpEffects.forEach(ef => {
     ctx.strokeStyle = `rgba(255, 255, 255, ${ef.alpha})`;
     ctx.lineWidth = 3;
@@ -560,7 +583,6 @@ function draw() {
     ctx.stroke();
   });
 
-  // Bitiş Bayrağı
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(flag.x, flag.y, 6, flag.height);
   ctx.fillStyle = '#e52521';
@@ -570,7 +592,6 @@ function draw() {
   ctx.lineTo(flag.x + 6, flag.y + 50);
   ctx.fill();
 
-  // Oyuncu
   ctx.fillStyle = '#e52521';
   ctx.fillRect(player.x, player.y, player.width, player.height);
   ctx.fillStyle = '#0058f8';
@@ -580,7 +601,6 @@ function draw() {
 
   ctx.restore();
 
-  // Durum Ekranları (Bölüm Geçildi / Oyun Bitti / Oyun Tamamlandı)
   if (gameOver || levelCleared || allCompleted) {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -606,7 +626,6 @@ function draw() {
   }
 }
 
-// 144Hz / 240Hz Bağımsız Sabit Zaman Adımlı (Fixed Timestep) Motor
 const FIXED_STEP = 1000 / 60;
 let lastTime = performance.now();
 let accumulator = 0;
@@ -637,7 +656,6 @@ function handleScreenAction() {
   }
 }
 
-// Klavye Kontrolleri
 window.addEventListener('keydown', e => {
   if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
   if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
@@ -653,7 +671,6 @@ window.addEventListener('keyup', e => {
   if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
 });
 
-// Mobil Dokunmatik Kontroller
 const bindMove = (id, key) => {
   const btn = document.getElementById(id);
   btn.addEventListener('touchstart', e => { e.preventDefault(); keys[key] = true; }, { passive: false });
