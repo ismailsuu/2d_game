@@ -1,7 +1,7 @@
 {
-  "name": "Süper JS Mario",
-  "short_name": "JS Mario",
-  "description": "Saf JavaScript ile geliştirilmiş 2D platform oyunu",
+  "name": "2D Platform",
+  "short_name": "2D Platform",
+  "description": "2D Platform Oyunu",
   "start_url": "/2d_game/index.html",
   "scope": "/2d_game/",
   "display": "standalone",
