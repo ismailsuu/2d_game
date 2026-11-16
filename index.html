@@ -109,9 +109,9 @@ const ctx = canvas.getContext('2d');
 const scoreEl = document.getElementById('score');
 const coinsEl = document.getElementById('coins');
 
-// Oyun Sabitleri
-const GRAVITY = 0.6;
-const FRICTION = 0.8;
+// Dengeli Oyun Sabitleri
+const GRAVITY = 0.5;
+const FRICTION = 0.82;
 let score = 0;
 let coinCount = 0;
 let cameraX = 0;
@@ -124,11 +124,11 @@ const keys = { right: false, left: false, up: false };
 // Oyuncu Nesnesi
 const player = {
   x: 60, y: 200, width: 32, height: 42,
-  vx: 0, vy: 0, speed: 5, jumpPower: -13,
+  vx: 0, vy: 0, speed: 4, jumpPower: -11.5,
   grounded: false
 };
 
-// Harita Elemanları (Platformlar, Borular, Altınlar, Düşmanlar, Bayrak)
+// Harita Elemanları
 let platforms = [];
 let coins = [];
 let enemies = [];
@@ -139,7 +139,7 @@ function initLevel() {
   cameraX = 0; score = 0; coinCount = 0; gameOver = false; gameWon = false;
   updateHUD();
 
-  // Zemin ve Bloklar (x, y, genişlik, yükseklik, tip)
+  // Zemin, Tuğlalar ve Borular
   platforms = [
     { x: 0, y: 400, w: 700, h: 50, type: 'ground' },
     { x: 800, y: 400, w: 650, h: 50, type: 'ground' },
@@ -169,11 +169,11 @@ function initLevel() {
     { x: 1840, y: 240, r: 10, collected: false }
   ];
 
-  // Düşmanlar (Goomba benzeri)
+  // Düşmanlar (Dengeli hızlarla)
   enemies = [
-    { x: 500, y: 368, w: 32, h: 32, vx: -1.5, minX: 480, maxX: 680, alive: true },
-    { x: 1000, y: 368, w: 32, h: 32, vx: -2, minX: 820, maxX: 1100, alive: true },
-    { x: 1700, y: 368, w: 32, h: 32, vx: -2, minX: 1600, maxX: 1950, alive: true }
+    { x: 500, y: 368, w: 32, h: 32, vx: -1.2, minX: 480, maxX: 680, alive: true },
+    { x: 1000, y: 368, w: 32, h: 32, vx: -1.5, minX: 820, maxX: 1100, alive: true },
+    { x: 1700, y: 368, w: 32, h: 32, vx: -1.5, minX: 1600, maxX: 1950, alive: true }
   ];
 }
 
@@ -255,10 +255,9 @@ function update() {
     if (e.x <= e.minX || e.x + e.w >= e.maxX) e.vx *= -1;
 
     if (checkCollision(player, e)) {
-      // Oyuncu düşmanın kafasına zıpladıysa
-      if (player.vy > 0 && player.y + player.height - player.vy <= e.y + 10) {
+      if (player.vy > 0 && player.y + player.height - player.vy <= e.y + 12) {
         e.alive = false;
-        player.vy = -8; // Sekme efekti
+        player.vy = -7.5;
         score += 200;
         updateHUD();
       } else {
@@ -285,7 +284,7 @@ function draw() {
   ctx.save();
   ctx.translate(-cameraX, 0);
 
-  // Bulutlar (Arka plan dekoru)
+  // Bulutlar
   ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
   [150, 550, 1050, 1600, 2100].forEach(cx => {
     ctx.beginPath();
@@ -300,7 +299,7 @@ function draw() {
     if (p.type === 'ground') {
       ctx.fillStyle = '#c84c0c';
       ctx.fillRect(p.x, p.y, p.w, p.h);
-      ctx.fillStyle = '#00a800'; // Çimen üst katman
+      ctx.fillStyle = '#00a800';
       ctx.fillRect(p.x, p.y, p.w, 10);
     } else if (p.type === 'brick') {
       ctx.fillStyle = '#b84818';
@@ -333,7 +332,6 @@ function draw() {
     if (e.alive) {
       ctx.fillStyle = '#8b4513';
       ctx.fillRect(e.x, e.y, e.w, e.h);
-      // Gözler
       ctx.fillStyle = '#fff';
       ctx.fillRect(e.x + 6, e.y + 8, 6, 6);
       ctx.fillRect(e.x + 20, e.y + 8, 6, 6);
@@ -350,12 +348,12 @@ function draw() {
   ctx.lineTo(flag.x + 6, flag.y + 50);
   ctx.fill();
 
-  // Oyuncu (Mario Temsili Çizim)
-  ctx.fillStyle = '#e52521'; // Şapka ve Tişört
+  // Oyuncu
+  ctx.fillStyle = '#e52521';
   ctx.fillRect(player.x, player.y, player.width, player.height);
-  ctx.fillStyle = '#0058f8'; // Tulum
+  ctx.fillStyle = '#0058f8';
   ctx.fillRect(player.x + 4, player.y + 20, player.width - 8, 22);
-  ctx.fillStyle = '#ffcc99'; // Yüz
+  ctx.fillStyle = '#ffcc99';
   ctx.fillRect(player.x + 8, player.y + 6, 18, 12);
 
   ctx.restore();
@@ -373,10 +371,20 @@ function draw() {
   }
 }
 
-function loop() {
-  update();
-  draw();
+// 60 FPS Sabitlenmiş Oyun Döngüsü (120Hz/144Hz ekran koruması)
+let lastTime = 0;
+const FPS = 60;
+const frameInterval = 1000 / FPS;
+
+function loop(timestamp) {
   requestAnimationFrame(loop);
+
+  const deltaTime = timestamp - lastTime;
+  if (deltaTime >= frameInterval) {
+    lastTime = timestamp - (deltaTime % frameInterval);
+    update();
+    draw();
+  }
 }
 
 // Klavye Kontrolleri
@@ -408,7 +416,7 @@ canvas.addEventListener('click', () => {
 });
 
 initLevel();
-loop();
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>
