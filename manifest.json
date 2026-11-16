@@ -5,8 +5,8 @@
   "start_url": "/2d_game/index.html",
   "scope": "/2d_game/",
   "display": "standalone",
-  "orientation": "landscape",
-  "background_color": "#1e293b",
+  "orientation": "landscape-primary",
+  "background_color": "#0f172a",
   "theme_color": "#5c94fc",
   "icons": [
     {
