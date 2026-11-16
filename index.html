@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Süper JS Mario</title>
+  <title>2D Platform</title>
   <link rel="manifest" href="/2d_game/manifest.json">
   <link rel="icon" type="image/png" href="/2d_game/icon.png">
   <link rel="apple-touch-icon" href="/2d_game/icon.png">
@@ -37,20 +37,12 @@
       text-align: center;
     }
     .game-title {
-      font-size: clamp(32px, 6vw, 54px);
+      font-size: clamp(34px, 6.5vw, 58px);
       font-weight: 900;
       color: #ffffff;
       text-shadow: 4px 4px 0 #1e293b, -1px -1px 0 #1e293b;
-      margin-bottom: 8px;
-      letter-spacing: 1px;
-    }
-    .game-subtitle {
-      font-size: 15px;
-      color: #f8fafc;
-      background: rgba(15, 23, 42, 0.45);
-      padding: 6px 16px;
-      border-radius: 20px;
-      margin-bottom: 28px;
+      margin-bottom: 32px;
+      letter-spacing: 2px;
     }
     .menu-buttons {
       display: flex;
@@ -164,7 +156,7 @@
       transform: scale(0.94);
     }
 
-    /* OYUN İÇİ DİKEY UYARI (Sadece oyun başladıktan sonra dik tutulursa) */
+    /* OYUN İÇİ DİKEY UYARI */
     #rotate-warning {
       display: none;
       position: fixed;
@@ -204,8 +196,7 @@
 
   <!-- ANA MENÜ -->
   <div id="main-menu">
-    <div class="game-title">SÜPER JS MARİO</div>
-    <div class="game-subtitle">5 Bölüm • Çift Zıplama • 4 Düşman Türü</div>
+    <div class="game-title">2D PLATFORM</div>
     <div class="menu-buttons">
       <button class="menu-btn" id="btn-continue">DEVAM ET</button>
       <button class="menu-btn" id="btn-new-game">YENİ OYUN</button>
@@ -327,12 +318,10 @@ async function enterLandscapeGame(startLevel, startScore, startCoins) {
   mainMenu.style.display = 'none';
   gameContainer.style.display = 'block';
 
-  // Mobil cihazsa dokunmatik kontrolleri göster
   if (window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
     mobileControls.style.display = 'flex';
   }
 
-  // Tam ekran ve ekranı sola yatırma isteği (Kullanıcı tıklamasıyla tetiklenir)
   try {
     const docEl = document.documentElement;
     if (docEl.requestFullscreen && !document.fullscreenElement) {
@@ -343,9 +332,7 @@ async function enterLandscapeGame(startLevel, startScore, startCoins) {
     if (screen.orientation && screen.orientation.lock) {
       await screen.orientation.lock('landscape-primary');
     }
-  } catch (e) {
-    // Bazı tarayıcılar fullscreen/lock izin vermezse CSS uyarısı devreye girer
-  }
+  } catch (e) {}
 
   score = startScore;
   coinCount = startCoins;
